@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "59661554320",
+    "project_id": "watch-hub-9529d",
+    "storage_bucket": "watch-hub-9529d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:59661554320:android:853957cebee7aab75a3e15",
+        "android_client_info": {
+          "package_name": "com.example.watch_hub_ep"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "59661554320-53mm6clo8kv4nk8g01n2u1khq4m131iq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.watch_hub_ep",
+            "certificate_hash": "0f9f3da78348680e7eee0c2424dc040338dd11f0"
+          }
+        },
+        {
+          "client_id": "59661554320-a4u8io4s8m769e3d28ojd4t4c1e3nj9p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAd43Wq3VvkRLhJ7p_P4JyBAN1HoX9HYSU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "59661554320-a4u8io4s8m769e3d28ojd4t4c1e3nj9p.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "59661554320-vf7gfjeqkghte08spdf56a5slud8h34q.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.watchHubEp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

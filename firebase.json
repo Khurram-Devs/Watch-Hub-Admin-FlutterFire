@@ -1,0 +1,42 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "watch-hub-9529d",
+          "appId": "1:59661554320:android:853957cebee7aab75a3e15",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "watch-hub-9529d",
+          "configurations": {
+            "android": "1:59661554320:android:853957cebee7aab75a3e15",
+            "ios": "1:59661554320:ios:2d841bcc446fc4175a3e15",
+            "macos": "1:59661554320:ios:2d841bcc446fc4175a3e15",
+            "web": "1:59661554320:web:664b6b323e20cb415a3e15",
+            "windows": "1:59661554320:web:a31168a3eeaba1535a3e15"
+          }
+        }
+      }
+    }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run lint",
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ]
+}
