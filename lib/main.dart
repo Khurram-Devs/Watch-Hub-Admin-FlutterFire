@@ -15,6 +15,7 @@ import 'screens/viewscreens/testimonials_screen.dart';
 import 'screens/viewscreens/contact_messages_screen.dart';
 import 'screens/viewscreens/product_faq_screen.dart';
 import 'screens/viewscreens/promo_codes_screen.dart';
+import 'screens/viewscreens/dashboard.dart';
 
 String? currentAdminRole;
 bool get isLoggedIn => currentAdminRole != null;
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
                 title: 'Dashboard',
                 drawerIndex: -1,
                 bottomNavIndex: 0,
-                body: const ProductTableScreen(),
+                body: DashboardScreen(role: currentAdminRole!),
               ),
         ),
         GoRoute(

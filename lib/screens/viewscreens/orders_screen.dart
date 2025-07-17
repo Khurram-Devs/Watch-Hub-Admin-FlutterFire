@@ -3,6 +3,7 @@ import 'package:watch_hub_ep/models/order_model.dart';
 import 'package:watch_hub_ep/services/order_service.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:watch_hub_ep/services/user_service.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 
 class OrdersScreen extends StatefulWidget {
   const OrdersScreen({super.key});
@@ -14,7 +15,7 @@ class OrdersScreen extends StatefulWidget {
 class _OrdersScreenState extends State<OrdersScreen> {
   List<OrderModel> _orders = [];
   List<OrderModel> _filteredOrders = [];
-  Map<String, Map<String, String>> _userDetails = {}; // userId -> {fullName, avatarUrl}
+  Map<String, Map<String, String>> _userDetails = {};
   String _searchQuery = '';
   String _sortBy = 'created At';
   bool _isLoading = true;
@@ -182,7 +183,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                         ),
                                         const SizedBox(height: 6),
                                         Text("Total: \$${o.total.toStringAsFixed(2)}"),
-                                        Text("Status: ${o.status}",
+                                        Text("Status: ${capitalize(o.status)}",
                                             style: TextStyle(
                                                 color: _statusColor(o.status),
                                                 fontWeight: FontWeight.w600)),

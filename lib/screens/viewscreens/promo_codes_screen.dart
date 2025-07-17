@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/models/promo_code_model.dart';
 import 'package:watch_hub_ep/services/promo_code_service.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import 'package:watch_hub_ep/widgets/layout/app_bottom_navbar.dart';
 import 'package:watch_hub_ep/widgets/layout/app_drawer.dart';
 import '../addscreens/add_promo_code_screen.dart';
@@ -69,7 +70,7 @@ class _PromoCodesScreenState extends State<PromoCodesScreen> {
                     final p = _codes[i];
                     return Card(
                       child: ListTile(
-                        title: Text(p.title),
+                        title: Text(capitalizeEachWord(p.title)),
                         subtitle: Text("Code: ${p.code} • ${p.discountPercent}% off • Limit: ${p.limit} • Used: ${p.usedTimes}"),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:watch_hub_ep/models/user_model.dart';
 import 'package:watch_hub_ep/services/user_service.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import 'package:watch_hub_ep/widgets/layout/app_drawer.dart';
 import 'package:watch_hub_ep/widgets/layout/app_bottom_navbar.dart';
 
@@ -45,13 +46,13 @@ class _UsersScreenState extends State<UsersScreen> {
                         leading: CircleAvatar(
                           backgroundImage: NetworkImage(u.avatarUrl),
                         ),
-                        title: Text(u.fullName),
+                        title: Text(capitalizeEachWord(u.fullName)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text("Email: ${u.email}"),
                             Text("Phone: ${u.phone}"),
-                            Text("Occupation: ${u.occupation}"),
+                            Text("Occupation: ${capitalizeEachWord(u.occupation)}"),
                             Text("Joined: ${timeago.format(u.createdAt.toDate())}"),
                           ],
                         ),

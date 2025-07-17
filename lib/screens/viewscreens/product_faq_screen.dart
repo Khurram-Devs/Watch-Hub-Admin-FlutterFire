@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/models/faq_model.dart';
 import 'package:watch_hub_ep/services/faq_service.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import 'package:watch_hub_ep/widgets/layout/app_bottom_navbar.dart';
 import 'package:watch_hub_ep/widgets/layout/app_drawer.dart';
 
@@ -102,8 +103,8 @@ class _ProductFAQScreenState extends State<ProductFAQScreen> {
                     return Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: ListTile(
-                        title: Text(faq.question),
-                        subtitle: Text(faq.answer),
+                        title: Text(capitalize(faq.question)),
+                        subtitle: Text(capitalize(faq.answer)),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [

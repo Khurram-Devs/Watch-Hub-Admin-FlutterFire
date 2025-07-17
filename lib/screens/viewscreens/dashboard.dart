@@ -1,333 +1,138 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
-import 'package:fl_chart/fl_chart.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+class DashboardScreen extends StatefulWidget {
+  final String role;
+  const DashboardScreen({super.key, required this.role});
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
-class _DashboardState extends State<Dashboard>
-    with SingleTickerProviderStateMixin {
-  int categoryCount = 0;
-  int productCount = 180;
-  int userCount = 150;
-  int orderCount = 210;
-  int revenue = 110;
-  bool isLoading = true;
-
-  late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
+class _DashboardScreenState extends State<DashboardScreen> {
+  int totalOrders = 0, totalUsers = 0;
+  int totalManagers = 0, totalCodes = 0, totalBrands = 0;
+  int totalMessages = 0, totalTestimonials = 0;
+  double totalRevenue = 0;
+  bool loading = true;
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
-    fetchCounts();
-    _animationController.forward();
+    _loadMetrics();
   }
 
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
+  Future<void> _loadMetrics() async {
+    setState(() => loading = true);
 
-  void fetchCounts() async {
-    try {
-      final categorySnapshot =
-          await FirebaseDatabase.instance.ref().child('Category').once();
-      if (categorySnapshot.snapshot.value != null) {
-        final data = categorySnapshot.snapshot.value as Map;
-        categoryCount = data.length;
+    final usersSnap =
+        await FirebaseFirestore.instance.collection('usersProfile').get();
+    totalUsers = usersSnap.docs.length;
+
+    int ordersCount = 0;
+    double revenueSum = 0;
+
+    for (var u in usersSnap.docs) {
+      final orders = await u.reference.collection('orders').get();
+      for (var o in orders.docs) {
+        ordersCount++;
+        revenueSum += (o.data()['total'] ?? 0).toDouble();
       }
-
-      final productSnapshot =
-          await FirebaseDatabase.instance.ref().child('product').once();
-      if (productSnapshot.snapshot.value != null) {
-        final data = productSnapshot.snapshot.value as Map;
-        productCount = data.length;
-      }
-
-      setState(() {
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() => isLoading = false);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error loading data: $e')));
     }
+
+    totalOrders = ordersCount;
+    totalRevenue = revenueSum;
+
+    final futures = await Future.wait([
+      FirebaseFirestore.instance.collection('admin').get(),
+      FirebaseFirestore.instance.collection('promoCodes').get(),
+      FirebaseFirestore.instance
+          .collection('categories')
+          .where('type', isEqualTo: 1)
+          .get(),
+      FirebaseFirestore.instance.collection('contactMessages').get(),
+      FirebaseFirestore.instance.collection('testimonials').get(),
+    ]);
+
+    totalManagers = futures[0].docs.length;
+    totalCodes = futures[1].docs.length;
+    totalBrands = futures[2].docs.length;
+    totalMessages = futures[3].docs.length;
+    totalTestimonials = futures[4].docs.length;
+
+    setState(() => loading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    if (loading) return const Center(child: CircularProgressIndicator());
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      body:
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : FadeTransition(
-                opacity: _fadeAnimation,
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildWelcomeSection(user),
-                      const SizedBox(height: 24),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildStatCard(
-                              'Total Orders',
-                              revenue,
-                              70,
-                              const Color(0xFF10B981),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildStatCard(
-                              'Total Orders',
-                              orderCount,
-                              70,
-                              const Color(0xFF3B82F6),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildStatCard(
-                              'Total Clients',
-                              userCount,
-                              70,
-                              const Color(0xFF10B981),
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: _buildStatCard(
-                              'Revenue',
-                              revenue,
-                              70,
-                              const Color(0xFF8B5CF6),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      _buildRevenueChart(),
-                      const SizedBox(height: 40),
-                    ],
-                  ),
-                ),
-              ),
-    );
-  }
+    final metrics = [
+      _MetricData(Icons.shopping_cart, 'Total Orders', totalOrders.toString()),
+      _MetricData(Icons.people, 'Total Users', totalUsers.toString()),
+      _MetricData(
+        Icons.attach_money,
+        'Revenue',
+        '\$${totalRevenue.toStringAsFixed(2)}',
+      ),
+      _MetricData(Icons.manage_accounts, 'Managers', totalManagers.toString()),
+      _MetricData(Icons.percent, 'Promo Codes', totalCodes.toString()),
+      _MetricData(Icons.branding_watermark, 'Brands', totalBrands.toString()),
+      _MetricData(Icons.message, 'Messages', totalMessages.toString()),
+      _MetricData(Icons.reviews, 'Testimonials', totalTestimonials.toString()),
+    ];
 
-  Widget _buildWelcomeSection(User? user) {
-    String userName =
-        user?.displayName ?? user?.email?.split('@')[0] ?? 'Admin';
-
-    return Padding(
-      padding: const EdgeInsets.only(left: 4, bottom: 8),
-      child: Text(
-        'Hey, $userName',
-        style: const TextStyle(
-          color: Color(0xFF1F2937),
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          letterSpacing: -0.5,
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: GridView.count(
+            crossAxisCount: MediaQuery.of(context).size.width > 800 ? 4 : 2,
+            crossAxisSpacing: 16,
+            mainAxisSpacing: 16,
+            shrinkWrap: true,
+            physics:
+                const NeverScrollableScrollPhysics(),
+            children: metrics.map((m) => _MetricCard(data: m)).toList(),
+          ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildStatCard(String title, int count, int percentage, Color color) {
-    return Container(
-      height: 140,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '$count',
-            style: const TextStyle(
-              color: Colors.black,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.grey.shade600,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              Text(
-                '0%',
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
-              ),
-              const Spacer(),
-              Text(
-                '$percentage%',
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          LinearProgressIndicator(
-            value: percentage / 100,
-            backgroundColor: Colors.grey.shade200,
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-            minHeight: 4,
-          ),
-        ],
-      ),
-    );
-  }
+class _MetricData {
+  final IconData icon;
+  final String label;
+  final String value;
+  _MetricData(this.icon, this.label, this.value);
+}
 
-  Widget _buildRevenueChart() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color.fromARGB(255, 194, 191, 191).withOpacity(0.05),
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Revenue',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
+class _MetricCard extends StatelessWidget {
+  final _MetricData data;
+  const _MetricCard({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(data.icon, size: 40, color: Colors.deepPurple),
+            const SizedBox(height: 12),
+            Text(
+              data.value,
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 200,
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        const days = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-                        if (value.toInt() < days.length) {
-                          return Text(
-                            days[value.toInt()],
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 12,
-                            ),
-                          );
-                        }
-                        return const Text('');
-                      },
-                    ),
-                  ),
-                  leftTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget:
-                          (value, meta) => Text(
-                            '${value.toInt()}',
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 10,
-                            ),
-                          ),
-                    ),
-                  ),
-                  topTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: const AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                minX: 0,
-                maxX: 6,
-                minY: 15,
-                maxY: 60,
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: const [
-                      FlSpot(0, 35),
-                      FlSpot(1, 45),
-                      FlSpot(2, 55),
-                      FlSpot(3, 30),
-                      FlSpot(4, 50),
-                      FlSpot(5, 35),
-                      FlSpot(6, 40),
-                    ],
-                    isCurved: true,
-                    color: const Color(0xFF14B8A6),
-                    barWidth: 3,
-                    dotData: const FlDotData(show: false),
-                  ),
-                  LineChartBarData(
-                    spots: const [
-                      FlSpot(0, 40),
-                      FlSpot(1, 30),
-                      FlSpot(2, 35),
-                      FlSpot(3, 25),
-                      FlSpot(4, 45),
-                      FlSpot(5, 35),
-                      FlSpot(6, 30),
-                    ],
-                    isCurved: true,
-                    color: const Color(0xFF1E3A8A),
-                    barWidth: 3,
-                    dotData: const FlDotData(show: false),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(data.label, textAlign: TextAlign.center),
+          ],
+        ),
       ),
     );
   }

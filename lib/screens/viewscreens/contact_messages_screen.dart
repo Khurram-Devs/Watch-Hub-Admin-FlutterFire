@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:watch_hub_ep/utils/string_utils.dart';
 import '../../models/contact_message_model.dart';
 import '../../services/contact_message_service.dart';
 import '../../widgets/layout/app_drawer.dart';
@@ -60,18 +61,18 @@ class _ContactMessagesScreenState extends State<ContactMessagesScreen> {
                   padding: const EdgeInsets.all(12),
                   itemCount: _messages.length,
                   itemBuilder: (_, i) {
-                    final msg = _messages[i];
+                  final msg = _messages[i];
                     return Card(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16),
-                        title: Text(msg.name),
+                        title: Text(capitalizeEachWord(msg.name)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(msg.email, style: const TextStyle(fontSize: 12, color: Colors.grey)),
                             const SizedBox(height: 6),
-                            Text(msg.message),
+                            Text(capitalize(msg.message)),
                             const SizedBox(height: 8),
                             Text(timeago.format(msg.createdAt.toDate()), style: const TextStyle(fontSize: 12, color: Colors.grey)),
                           ],

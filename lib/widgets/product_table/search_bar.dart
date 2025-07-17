@@ -20,7 +20,7 @@ class ProductSearchBar extends StatelessWidget {
             child: TextField(
               controller: controller,
               decoration: InputDecoration(
-                hintText: 'Search products...',
+                hintText: 'Search...',
                 prefixIcon: const Icon(Icons.search, color: Color(0xFF5B8A9A)),
                 suffixIcon: controller.text.isNotEmpty
                     ? IconButton(
