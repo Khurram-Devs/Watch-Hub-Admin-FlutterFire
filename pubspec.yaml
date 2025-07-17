@@ -23,6 +23,7 @@ dependencies:
   go_router: ^13.0.1
   flutter_svg: ^2.2.0
   timeago: ^3.7.1
+  badges: ^3.1.2
 
 
 dev_dependencies:

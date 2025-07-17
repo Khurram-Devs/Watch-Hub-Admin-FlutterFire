@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:badges/badges.dart' as badges;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:watch_hub_ep/main.dart';
 
-class AdminLayout extends StatefulWidget {
+class AdminLayout extends StatelessWidget {
   final String title;
-  final int? drawerIndex; // Highlight in sidebar, optional
-  final int? bottomNavIndex; // Selected tab, or null
+  final int? drawerIndex;
+  final int? bottomNavIndex;
   final Widget body;
+  final String role;
+
+  final int unseenOrders;
+  final int unseenMessages;
 
   const AdminLayout({
     super.key,
@@ -13,14 +20,12 @@ class AdminLayout extends StatefulWidget {
     required this.drawerIndex,
     required this.bottomNavIndex,
     required this.body,
+    required this.role,
+    this.unseenOrders = 0,
+    this.unseenMessages = 0,
   });
 
-  @override
-  State<AdminLayout> createState() => _AdminLayoutState();
-}
-
-class _AdminLayoutState extends State<AdminLayout> {
-  void _onDrawerTap(int index) {
+  Future<void> _onDrawerTap(BuildContext context, int index) async {
     switch (index) {
       case 0:
         context.go('/products');
@@ -46,10 +51,24 @@ class _AdminLayoutState extends State<AdminLayout> {
       case 7:
         context.go('/orders');
         break;
+      case 8:
+        context.go('/managers');
+        break;
+
+      case 99: // Logout
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('role');
+        currentAdminRole = null;
+        loginStateNotifier.value = false;
+
+        if (context.mounted) {
+          context.go('/login');
+        }
+        break;
     }
   }
 
-  void _onBottomTap(int index) {
+  void _onBottomTap(BuildContext context, int index) {
     switch (index) {
       case 0:
         context.go('/dashboard');
@@ -66,68 +85,150 @@ class _AdminLayoutState extends State<AdminLayout> {
     }
   }
 
+  bool _canAccess(int index) {
+    switch (index) {
+      case 0:
+        return role == 'SUPER ADMIN' || role == 'PRODUCT MANAGER';
+      case 1:
+        return role == 'SUPER ADMIN' || role == 'BRANDS MANAGER';
+      case 2:
+      case 3:
+        return role == 'SUPER ADMIN' || role == 'CUSTOMER SERVICE';
+      case 4:
+      case 5:
+        return role == 'SUPER ADMIN' || role == 'PRODUCT MANAGER';
+      case 6:
+      case 8:
+        return role == 'SUPER ADMIN';
+      case 7:
+        return role == 'SUPER ADMIN' ||
+            role == 'ORDERS MANAGER' ||
+            role == 'CUSTOMER SERVICE';
+      default:
+        return true;
+    }
+  }
+
+  Widget _buildDrawerItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    int index, {
+    int badgeCount = 0,
+  }) {
+    if (index != 99 && !_canAccess(index)) return const SizedBox.shrink();
+
+    final isSelected = drawerIndex == index;
+
+    final iconWidget =
+        badgeCount > 0
+            ? badges.Badge(
+              badgeContent: Text(
+                '$badgeCount',
+                style: const TextStyle(color: Colors.white, fontSize: 10),
+              ),
+              child: Icon(icon),
+              position: badges.BadgePosition.topEnd(top: -12, end: -6),
+            )
+            : Icon(icon);
+
+    return ListTile(
+      selected: isSelected,
+      selectedTileColor: Colors.deepPurple.shade100,
+      leading: iconWidget,
+      title: Text(title),
+      onTap: () => _onDrawerTap(context, index),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
-        elevation: 0,
+        title: Row(
+          children: [
+            Text(title),
+            const Spacer(),
+            if (unseenOrders > 0)
+              badges.Badge(
+                badgeContent: Text(
+                  '$unseenOrders',
+                  style: const TextStyle(color: Colors.white, fontSize: 10),
+                ),
+                position: badges.BadgePosition.topEnd(top: 0, end: 0),
+                child: const Icon(Icons.notifications),
+              ),
+          ],
+        ),
         backgroundColor: Colors.deepPurple.shade400,
         foregroundColor: Colors.white,
+        elevation: 0,
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             const DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.deepPurple,
-              ),
+              decoration: BoxDecoration(color: Colors.deepPurple),
               child: Text(
                 'Admin Panel',
                 style: TextStyle(color: Colors.white, fontSize: 24),
               ),
             ),
-            _buildDrawerItem('Products', Icons.watch, 0),
-            _buildDrawerItem('Brands', Icons.branding_watermark, 1),
-            _buildDrawerItem('Testimonials', Icons.reviews, 2),
-            _buildDrawerItem('Contact Messages', Icons.message, 3),
-            _buildDrawerItem('Product FAQs', Icons.question_answer, 4),
-            _buildDrawerItem('Promo Codes', Icons.discount, 5),
-            _buildDrawerItem('Users', Icons.people, 6),
-            _buildDrawerItem('Orders', Icons.receipt, 7),
+            _buildDrawerItem(context, 'Products', Icons.watch, 0),
+            _buildDrawerItem(context, 'Brands', Icons.branding_watermark, 1),
+            _buildDrawerItem(context, 'Testimonials', Icons.reviews, 2),
+            _buildDrawerItem(
+              context,
+              'Contact Messages',
+              Icons.message,
+              3,
+              badgeCount: unseenMessages,
+            ),
+            _buildDrawerItem(context, 'Product FAQs', Icons.question_answer, 4),
+            _buildDrawerItem(context, 'Promo Codes', Icons.discount, 5),
+            _buildDrawerItem(context, 'Users', Icons.people, 6),
+            _buildDrawerItem(
+              context,
+              'Orders',
+              Icons.receipt,
+              7,
+              badgeCount: unseenOrders,
+            ),
+            _buildDrawerItem(
+              context,
+              'Managers',
+              Icons.supervised_user_circle_sharp,
+              8,
+              badgeCount: unseenOrders,
+            ),
+            const Divider(),
+            _buildDrawerItem(context, 'Logout', Icons.logout, 99),
           ],
         ),
       ),
-      body: widget.body,
-bottomNavigationBar: BottomNavigationBar(
-  currentIndex: (widget.bottomNavIndex != null &&
-          widget.bottomNavIndex! >= 0 &&
-          widget.bottomNavIndex! < 4)
-      ? widget.bottomNavIndex!
-      : 0,
-  onTap: _onBottomTap,
-  selectedItemColor: Colors.deepPurple,
-  unselectedItemColor: Colors.grey,
-  type: BottomNavigationBarType.fixed,
-  items: const [
-    BottomNavigationBarItem(icon: Icon(Icons.dashboard), label: 'Dashboard'),
-    BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Orders'),
-    BottomNavigationBarItem(icon: Icon(Icons.watch), label: 'Products'),
-    BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Users'),
-  ],
-),
-    );
-  }
-
-  Widget _buildDrawerItem(String title, IconData icon, int index) {
-    final isSelected = widget.drawerIndex == index;
-    return ListTile(
-      selected: isSelected,
-      selectedTileColor: Colors.deepPurple.shade100,
-      leading: Icon(icon, color: isSelected ? Colors.deepPurple : null),
-      title: Text(title),
-      onTap: () => _onDrawerTap(index),
+      body: body,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex:
+            (bottomNavIndex != null &&
+                    bottomNavIndex! >= 0 &&
+                    bottomNavIndex! < 4)
+                ? bottomNavIndex!
+                : 0,
+        onTap: (i) => _onBottomTap(context, i),
+        selectedItemColor: Colors.deepPurple,
+        unselectedItemColor: Colors.grey,
+        type: BottomNavigationBarType.fixed,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard),
+            label: 'Dashboard',
+          ),
+          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Orders'),
+          BottomNavigationBarItem(icon: Icon(Icons.watch), label: 'Products'),
+          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Users'),
+        ],
+      ),
     );
   }
 }
