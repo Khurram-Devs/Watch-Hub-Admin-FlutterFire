@@ -134,7 +134,7 @@ class AdminLayout extends StatelessWidget {
 
     return ListTile(
       selected: isSelected,
-      selectedTileColor: Colors.deepPurple.shade100,
+      selectedTileColor: Color(0xFF5B8A9A),
       leading: iconWidget,
       title: Text(title),
       onTap: () => _onDrawerTap(context, index),
@@ -160,7 +160,7 @@ class AdminLayout extends StatelessWidget {
               ),
           ],
         ),
-        backgroundColor: Colors.deepPurple.shade400,
+        backgroundColor: Color(0xFF5B8A9A),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -169,7 +169,7 @@ class AdminLayout extends StatelessWidget {
           padding: EdgeInsets.zero,
           children: [
             const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.deepPurple),
+              decoration: BoxDecoration(color: Color(0xFF5B8A9A)),
               child: Text(
                 'Admin Panel',
                 style: TextStyle(color: Colors.white, fontSize: 24),
@@ -216,7 +216,7 @@ class AdminLayout extends StatelessWidget {
                 ? bottomNavIndex!
                 : 0,
         onTap: (i) => _onBottomTap(context, i),
-        selectedItemColor: Colors.deepPurple,
+        selectedItemColor: Color(0xFF5B8A9A),
         unselectedItemColor: Colors.grey,
         type: BottomNavigationBarType.fixed,
         items: const [

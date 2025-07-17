@@ -92,8 +92,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
             shrinkWrap: true,
-            physics:
-                const NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             children: metrics.map((m) => _MetricCard(data: m)).toList(),
           ),
         ),
@@ -123,11 +122,11 @@ class _MetricCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(data.icon, size: 40, color: Colors.deepPurple),
+            Icon(data.icon, size: 40, color: Color(0xFF5B8A9A)),
             const SizedBox(height: 12),
             Text(
               data.value,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(data.label, textAlign: TextAlign.center),

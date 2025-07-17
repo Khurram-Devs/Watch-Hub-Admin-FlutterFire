@@ -29,31 +29,35 @@ class _ManagersScreenState extends State<ManagersScreen> {
   void _openForm({AdminModel? manager, String? docId}) {
     showDialog(
       context: context,
-      builder: (_) => ManagerFormDialog(
-        manager: manager,
-        docId: docId,
-        onSaved: _loadManagers,
-      ),
+      builder:
+          (_) => ManagerFormDialog(
+            manager: manager,
+            docId: docId,
+            onSaved: _loadManagers,
+          ),
     );
   }
 
   Future<void> _deleteManager(String docId) async {
     final confirmed = await showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Confirm Delete"),
-        content: const Text("Are you sure you want to delete this manager?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text("Cancel"),
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Confirm Delete"),
+            content: const Text(
+              "Are you sure you want to delete this manager?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Delete"),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text("Delete"),
-          ),
-        ],
-      ),
     );
 
     if (confirmed == true) {
@@ -89,7 +93,7 @@ class _ManagersScreenState extends State<ManagersScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         child: Row(
           children: [
-            const Icon(Icons.person, size: 40, color: Colors.deepPurple),
+            const Icon(Icons.person, size: 40, color: Color(0xFF5B8A9A)),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -97,11 +101,17 @@ class _ManagersScreenState extends State<ManagersScreen> {
                 children: [
                   Text(
                     m.id,
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: roleColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(20),
@@ -139,21 +149,22 @@ class _ManagersScreenState extends State<ManagersScreen> {
         onPressed: () => _openForm(),
         child: const Icon(Icons.add),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              padding: const EdgeInsets.only(top: 12, bottom: 100),
-              itemCount: _managers.length,
-              itemBuilder: (context, index) {
-                final m = _managers[index];
-                return FutureBuilder<String?>(
-                  future: AdminService.getDocIdByAdminId(m.id),
-                  builder: (context, snapshot) {
-                    return _buildManagerCard(m, snapshot.data);
-                  },
-                );
-              },
-            ),
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : ListView.builder(
+                padding: const EdgeInsets.only(top: 12, bottom: 100),
+                itemCount: _managers.length,
+                itemBuilder: (context, index) {
+                  final m = _managers[index];
+                  return FutureBuilder<String?>(
+                    future: AdminService.getDocIdByAdminId(m.id),
+                    builder: (context, snapshot) {
+                      return _buildManagerCard(m, snapshot.data);
+                    },
+                  );
+                },
+              ),
     );
   }
 }
