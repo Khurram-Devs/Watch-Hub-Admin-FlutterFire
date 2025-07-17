@@ -3,9 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:watch_hub_ep/extra/order.dart';
 import 'package:watch_hub_ep/screens/viewscreens/category_list.dart';
 import 'package:watch_hub_ep/screens/viewscreens/dashboard.dart';
-// import 'package:watch_hub_ep/screens/viewscreens/product_list.dart';
 import 'package:watch_hub_ep/screens/viewscreens/profile_screen.dart';
-import 'package:watch_hub_ep/screens/viewscreens/roles_list.dart';
 import 'package:watch_hub_ep/screens/viewscreens/user_list.dart';
 import 'package:watch_hub_ep/widgets/layout/app_bottom_navbar.dart';
 import 'package:watch_hub_ep/widgets/layout/app_drawer.dart';
@@ -48,9 +46,10 @@ class _MainLayoutState extends State<MainLayout> {
 
   final Map<String, Widget> _drawerPages = {
     'Dashboard': const Dashboard(),
-    'Roles & Permissions': const RoleListScreen(),
+    // 'Roles & Permissions': const RoleListScreen(),
     // 'Products': ProductTablePage(),
     'Categories': const CategoryList(),
+    // 'Categories': const CategoryList(),
     'Users': UserListPage(),
   };
 

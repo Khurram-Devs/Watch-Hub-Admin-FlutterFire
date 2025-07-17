@@ -29,14 +29,107 @@ class ProductService {
   static Future<void> addOrUpdateProduct(ProductModel product) async {
     final docRef = _firestore
         .collection('products')
-        .doc(product.id.isNotEmpty ? product.id : null);
-    final newDoc =
-        product.id.isEmpty ? _firestore.collection('products').doc() : docRef;
+        .doc(
+          product.id.isNotEmpty
+              ? product.id
+              : _firestore.collection('products').doc().id,
+        );
+
+    final isNew = product.id.isEmpty;
+
+    ProductModel? oldProduct;
+
+    if (!isNew) {
+      final oldSnap = await docRef.get();
+      if (oldSnap.exists) {
+        oldProduct = ProductModel.fromMap({
+          ...oldSnap.data()!,
+          'id': oldSnap.id,
+        });
+      }
+    }
+
     final updatedProduct =
-        product.id.isEmpty
-            ? product.copyWith(id: newDoc.id, createdAt: DateTime.now())
+        isNew
+            ? product.copyWith(id: docRef.id, createdAt: DateTime.now())
             : product;
 
-    await newDoc.set(updatedProduct.toMap());
+    await docRef.set(updatedProduct.toMap());
+
+    // Send notifications if needed
+    if (oldProduct != null) {
+      final oldStock = oldProduct.inventoryCount;
+      final newStock = updatedProduct.inventoryCount;
+
+      final oldPrice = oldProduct.price;
+      final newPrice = updatedProduct.price;
+
+      String? type;
+      String? title;
+      String? message;
+
+      if (oldStock == 0 && newStock > 0) {
+        // Back in stock
+        type = 'back_in_stock';
+        title = 'Back In Stock!';
+        message =
+            'The product "${updatedProduct.title}" is now available again.';
+      } else if (oldStock > 0 && newStock == 0) {
+        // Out of stock
+        type = 'out_of_stock';
+        title = 'Out of Stock!';
+        message = 'The product "${updatedProduct.title}" is now sold out.';
+      } else if (newPrice < oldPrice) {
+        // Price dropped
+        type = 'price_drop';
+        title = 'Price Dropped!';
+        message =
+            'The product "${updatedProduct.title}" you wishlisted is now \$${newPrice.toStringAsFixed(2)}.';
+      }
+
+      if (type != null) {
+        await _notifyUsersWithProductInWishlist(
+          updatedProduct.id,
+          title!,
+          message!,
+          type,
+        );
+      }
+    }
+  }
+
+  static Future<void> _notifyUsersWithProductInWishlist(
+    String productId,
+    String title,
+    String message,
+    String type,
+  ) async {
+    final usersSnapshot = await _firestore.collection('usersProfile').get();
+
+    for (var userDoc in usersSnapshot.docs) {
+      final data = userDoc.data();
+      final wishlist = data['wishlist'] ?? [];
+
+      final hasProduct = wishlist.any((ref) {
+        if (ref is DocumentReference) {
+          return ref.id == productId;
+        }
+        return false;
+      });
+
+      if (hasProduct) {
+        await _firestore
+            .collection('usersProfile')
+            .doc(userDoc.id)
+            .collection('notifications')
+            .add({
+              'title': title,
+              'message': message,
+              'type': type,
+              'isRead': false,
+              'createdAt': FieldValue.serverTimestamp(),
+            });
+      }
+    }
   }
 }

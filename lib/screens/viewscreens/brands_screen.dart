@@ -39,7 +39,7 @@ class _BrandsScreenState extends State<BrandsScreen> {
     setState(() => _isLoading = true);
     final type1 = await CategoryService.fetchByType(1);
     final type2 = await CategoryService.fetchByType(2);
-    final brands = [...type1.values, ...type2.values]; // Merged values from both maps
+    final brands = [...type1, ...type2]; // Merged values from both maps
     setState(() {
       _brands = brands;
       _applyFilter();
@@ -89,33 +89,6 @@ class _BrandsScreenState extends State<BrandsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text("Brand & Category List"),
-        backgroundColor: const Color(0xFF5B8A9A),
-        foregroundColor: Colors.white,
-        elevation: 1,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
-        ),
-      ),
-      drawer: AppDrawer(
-        items: [
-          {'icon': Icons.dashboard, 'title': 'Dashboard'},
-          {'icon': Icons.security, 'title': 'Roles & Permissions'},
-          {'icon': Icons.inventory_2, 'title': 'Products'},
-          {'icon': Icons.category, 'title': 'Categories'},
-          {'icon': Icons.group, 'title': 'Customers'},
-          {'icon': Icons.person, 'title': 'Users'},
-          {'icon': Icons.rate_review, 'title': 'Product Reviews'},
-        ],
-        selectedIndex: 3,
-        onItemTapped: (index) => Navigator.pop(context),
-        onLogoutTapped: () {},
-      ),
       body: Column(
         children: [
           ProductSearchBar(
@@ -180,10 +153,6 @@ class _BrandsScreenState extends State<BrandsScreen> {
                       ),
           ),
         ],
-      ),
-      bottomNavigationBar: AppBottomNavBar(
-        currentIndex: 3,
-        onTap: (index) {},
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {

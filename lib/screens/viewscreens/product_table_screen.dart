@@ -166,39 +166,6 @@ class _ProductTableScreenState extends State<ProductTableScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        title: const Text('Product List'),
-        backgroundColor: const Color(0xFF5B8A9A),
-        foregroundColor: Colors.white,
-        elevation: 1,
-        leading: Builder(
-          builder:
-              (context) => IconButton(
-                icon: const Icon(Icons.menu),
-                onPressed: () => Scaffold.of(context).openDrawer(),
-              ),
-        ),
-      ),
-      drawer: AppDrawer(
-        items: [
-          {'icon': Icons.dashboard, 'title': 'Dashboard'},
-          {'icon': Icons.security, 'title': 'Roles & Permissions'},
-          {'icon': Icons.inventory_2, 'title': 'Products'},
-          {'icon': Icons.category, 'title': 'Categories'},
-          {'icon': Icons.group, 'title': 'Customers'},
-          {'icon': Icons.person, 'title': 'Users'},
-          {'icon': Icons.rate_review, 'title': 'Product Reviews'},
-        ],
-        selectedIndex: 2,
-        onItemTapped: (index) {
-          // Use Navigator.pushNamed or update your layout state accordingly
-          Navigator.pop(context); // Close drawer
-        },
-        onLogoutTapped: () {
-          // Optional: show dialog or logout here
-        },
-      ),
       body: Column(
         children: [
           ProductSearchBar(
@@ -242,12 +209,7 @@ class _ProductTableScreenState extends State<ProductTableScreen> {
           ),
         ],
       ),
-      bottomNavigationBar: AppBottomNavBar(
-        currentIndex: 1,
-        onTap: (index) {
-          // Handle bottom nav tap
-        },
-      ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.push(
