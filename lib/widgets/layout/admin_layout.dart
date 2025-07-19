@@ -168,13 +168,42 @@ class AdminLayout extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Color(0xFF5B8A9A)),
-              child: Text(
-                'Admin Panel',
-                style: TextStyle(color: Colors.white, fontSize: 24),
+            Container(
+              height: 100,
+              color: const Color(0xFFA2CBDA),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Admin Panel',
+                    style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
+                    textAlign: TextAlign.center,
+                  ),
+                  Text(
+                    role,
+                    style: TextStyle(
+                      color:
+                          role.toUpperCase() == 'SUPER ADMIN'
+                              ? Colors.redAccent
+                              : role.toUpperCase() == 'PRODUCT MANAGER'
+                              ? Colors.deepPurple
+                              : role.toUpperCase() == 'BRANDS MANAGER'
+                              ? Colors.teal
+                              : role.toUpperCase() == 'CUSTOMER SERVICE'
+                              ? Colors.orange
+                              : role.toUpperCase() == 'ORDERS MANAGER'
+                              ? Colors.lightGreen
+                              : Colors.grey,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
+
             _buildDrawerItem(context, 'Products', Icons.watch, 0),
             _buildDrawerItem(context, 'Brands', Icons.branding_watermark, 1),
             _buildDrawerItem(context, 'Testimonials', Icons.reviews, 2),
