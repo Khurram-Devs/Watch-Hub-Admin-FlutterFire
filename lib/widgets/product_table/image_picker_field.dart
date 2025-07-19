@@ -8,7 +8,8 @@ class ImagePickerField extends StatelessWidget {
   final List<String> initialUrls;
   final int maxImages;
   final List<XFile> pickedFiles;
-  final void Function(List<String> urls, List<XFile> pickedFiles) onImagesSelected;
+  final void Function(List<String> urls, List<XFile> pickedFiles)
+  onImagesSelected;
 
   const ImagePickerField({
     super.key,
@@ -45,29 +46,30 @@ class ImagePickerField extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            // Existing Firestore URLs
             ...initialUrls.map(
-              (url) => _buildImagePreview(Image.network(url, fit: BoxFit.cover)),
+              (url) =>
+                  _buildImagePreview(Image.network(url, fit: BoxFit.cover)),
             ),
 
-            // Local selected files
             ...pickedFiles.map(
               (file) => FutureBuilder<Widget>(
                 future: _buildPreview(file),
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+                  if (snapshot.connectionState == ConnectionState.done &&
+                      snapshot.hasData) {
                     return _buildImagePreview(snapshot.data!);
                   }
                   return const SizedBox(
                     width: 80,
                     height: 80,
-                    child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                    child: Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
                   );
                 },
               ),
             ),
 
-            // Add button
             if (canPickMore) _buildImagePlaceholder(context),
           ],
         ),
@@ -102,7 +104,7 @@ class ImagePickerField extends StatelessWidget {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withValues(alpha: 0.08),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

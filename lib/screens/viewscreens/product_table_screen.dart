@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:watch_hub_ep/widgets/layout/app_bottom_navbar.dart';
-import 'package:watch_hub_ep/widgets/layout/app_drawer.dart';
 import '../../models/product_model.dart';
 import '../../models/category_model.dart';
 import '../../services/product_service.dart';
 import '../../widgets/product_table/search_bar.dart';
 import '../../widgets/product_table/filter_dialog.dart';
 import '../../widgets/product_table/product_card.dart';
-import '../editscreens/edit_product_screen.dart';
 import '../addscreens/add_product_screen.dart';
 
 class ProductTableScreen extends StatefulWidget {
@@ -193,9 +190,7 @@ class _ProductTableScreenState extends State<ProductTableScreen> {
                               context,
                               MaterialPageRoute(
                                 builder:
-                                    (_) => AddProductScreen(
-                                      existingProduct: p,
-                                    ),
+                                    (_) => AddProductScreen(existingProduct: p),
                               ),
                             );
                           },

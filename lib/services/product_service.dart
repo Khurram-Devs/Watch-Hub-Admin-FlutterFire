@@ -56,7 +56,6 @@ class ProductService {
 
     await docRef.set(updatedProduct.toMap());
 
-    // Send notifications if needed
     if (oldProduct != null) {
       final oldStock = oldProduct.inventoryCount;
       final newStock = updatedProduct.inventoryCount;
@@ -69,18 +68,15 @@ class ProductService {
       String? message;
 
       if (oldStock == 0 && newStock > 0) {
-        // Back in stock
         type = 'back_in_stock';
         title = 'Back In Stock!';
         message =
             'The product "${updatedProduct.title}" is now available again.';
       } else if (oldStock > 0 && newStock == 0) {
-        // Out of stock
         type = 'out_of_stock';
         title = 'Out of Stock!';
         message = 'The product "${updatedProduct.title}" is now sold out.';
       } else if (newPrice < oldPrice) {
-        // Price dropped
         type = 'price_drop';
         title = 'Price Dropped!';
         message =

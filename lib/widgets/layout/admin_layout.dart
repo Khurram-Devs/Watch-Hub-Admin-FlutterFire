@@ -55,7 +55,7 @@ class AdminLayout extends StatelessWidget {
         context.go('/managers');
         break;
 
-      case 99: // Logout
+      case 99:
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('role');
         currentAdminRole = null;
@@ -127,8 +127,8 @@ class AdminLayout extends StatelessWidget {
                 '$badgeCount',
                 style: const TextStyle(color: Colors.white, fontSize: 10),
               ),
-              child: Icon(icon),
               position: badges.BadgePosition.topEnd(top: -12, end: -6),
+              child: Icon(icon),
             )
             : Icon(icon);
 

@@ -17,7 +17,6 @@ class CategoryService {
     }).toList();
   }
 
-
   static Future<Map<String, CategoryModel>> fetchCategories() async {
     final snapshot = await _categoryCollection.get();
     Map<String, CategoryModel> map = {};

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/models/testimonial_model.dart';
 import 'package:watch_hub_ep/services/testimonial_service.dart';
-import 'package:watch_hub_ep/widgets/layout/app_drawer.dart';
-import 'package:watch_hub_ep/widgets/layout/app_bottom_navbar.dart';
 
 class TestimonialsScreen extends StatefulWidget {
   const TestimonialsScreen({super.key});
@@ -38,14 +36,21 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
   Future<void> _deleteTestimonial(TestimonialModel testimonial) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text("Delete Testimonial"),
-        content: Text("Are you sure you want to delete this testimonial?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Delete")),
-        ],
-      ),
+      builder:
+          (_) => AlertDialog(
+            title: const Text("Delete Testimonial"),
+            content: Text("Are you sure you want to delete this testimonial?"),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text("Delete"),
+              ),
+            ],
+          ),
     );
     if (confirm == true) {
       await TestimonialService.deleteTestimonial(testimonial.id);
@@ -56,47 +61,55 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _testimonials.isEmpty
+      body:
+          _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _testimonials.isEmpty
               ? const Center(child: Text("No testimonials found."))
               : ListView.builder(
-                  itemCount: _testimonials.length,
-                  padding: const EdgeInsets.all(12),
-                  itemBuilder: (_, i) {
-                    final t = _testimonials[i];
-                    return Card(
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16),
-                        title: Text(t.testimonial),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 4),
-                            Text("Status: ${t.status == 1 ? "Visible" : "Hidden"}"),
-                            Text("Created: ${t.createdAt.toDate().toLocal()}"),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(t.status == 1 ? Icons.visibility : Icons.visibility_off,
-                                  color: Colors.blue),
-                              onPressed: () => _toggleStatus(t),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteTestimonial(t),
-                            ),
-                          ],
-                        ),
+                itemCount: _testimonials.length,
+                padding: const EdgeInsets.all(12),
+                itemBuilder: (_, i) {
+                  final t = _testimonials[i];
+                  return Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.all(16),
+                      title: Text(t.testimonial),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 4),
+                          Text(
+                            "Status: ${t.status == 1 ? "Visible" : "Hidden"}",
+                          ),
+                          Text("Created: ${t.createdAt.toDate().toLocal()}"),
+                        ],
                       ),
-                    );
-                  },
-                ),
-
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              t.status == 1
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                              color: Colors.blue,
+                            ),
+                            onPressed: () => _toggleStatus(t),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                            onPressed: () => _deleteTestimonial(t),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
     );
   }
 }

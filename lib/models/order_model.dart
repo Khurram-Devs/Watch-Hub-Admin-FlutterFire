@@ -7,10 +7,7 @@ class OrderItem {
   OrderItem({required this.productRef, required this.quantity});
 
   factory OrderItem.fromMap(Map<String, dynamic> map) {
-    return OrderItem(
-      productRef: map['productRef'],
-      quantity: map['quantity'],
-    );
+    return OrderItem(productRef: map['productRef'], quantity: map['quantity']);
   }
 }
 
@@ -43,10 +40,15 @@ class OrderModel {
     required this.items,
   });
 
-  factory OrderModel.fromDoc(String id, String userId, Map<String, dynamic> data) {
-    final itemsList = (data['items'] as List)
-        .map((item) => OrderItem.fromMap(Map<String, dynamic>.from(item)))
-        .toList();
+  factory OrderModel.fromDoc(
+    String id,
+    String userId,
+    Map<String, dynamic> data,
+  ) {
+    final itemsList =
+        (data['items'] as List)
+            .map((item) => OrderItem.fromMap(Map<String, dynamic>.from(item)))
+            .toList();
 
     return OrderModel(
       id: id,

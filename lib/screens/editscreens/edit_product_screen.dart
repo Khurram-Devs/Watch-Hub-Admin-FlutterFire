@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:http_parser/http_parser.dart' as http_parser;
-import 'dart:typed_data';
 
 class EditProductScreen extends StatefulWidget {
   final Map<String, dynamic> product;
@@ -50,7 +49,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _initializeData();
   }
 
-  // Add the image upload method
   Future<String?> uploadImage(
     dynamic imageFile, [
     String? originalFilename,
@@ -117,30 +115,30 @@ class _EditProductScreenState extends State<EditProductScreen> {
         );
       }
 
-      print('Uploading to: $API_BASE_URL/simple_upload.php');
-      print('MIME Type: ${request.files.first.contentType}');
+      debugPrint('Uploading to: $API_BASE_URL/simple_upload.php');
+      debugPrint('MIME Type: ${request.files.first.contentType}');
 
       var response = await request.send();
       var responseData = await response.stream.toBytes();
       var responseString = String.fromCharCodes(responseData);
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: $responseString');
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: $responseString');
 
       if (response.statusCode == 200) {
         var jsonResponse = json.decode(responseString);
         if (jsonResponse['success']) {
           return jsonResponse['image_url'];
         } else {
-          print('Upload failed: ${jsonResponse['message']}');
+          debugPrint('Upload failed: ${jsonResponse['message']}');
           return null;
         }
       } else {
-        print('HTTP Error: ${response.statusCode}');
+        debugPrint('HTTP Error: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error uploading image: $e');
+      debugPrint('Error uploading image: $e');
       return null;
     }
   }
@@ -196,11 +194,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     setState(() {});
 
-    print('Product data: ${widget.product}');
-    print('Available brands: $availableBrands');
-    print('Available types: $availableTypes');
-    print('Selected brand: $selectedBrand');
-    print('Selected types: $selectedTypes');
+    debugPrint('Product data: ${widget.product}');
+    debugPrint('Available brands: $availableBrands');
+    debugPrint('Available types: $availableTypes');
+    debugPrint('Selected brand: $selectedBrand');
+    debugPrint('Selected types: $selectedTypes');
   }
 
   Future<void> _fetchCategories() async {
@@ -222,7 +220,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
       }
     }
 
-    print(
+    debugPrint(
       'Fetched Categories - Brands: $availableBrands, Types: $availableTypes',
     );
   }
@@ -278,9 +276,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
 
     try {
-      // Upload new images first
       List<String> uploadedImageUrls = [];
-      
+
       if (newImages.isNotEmpty) {
         for (int i = 0; i < newImages.length; i++) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -292,11 +289,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
           String? imageUrl;
           if (kIsWeb) {
-            // For web, convert XFile to Uint8List
             Uint8List imageBytes = await newImages[i].readAsBytes();
             imageUrl = await uploadImage(imageBytes, newImages[i].name);
           } else {
-            // For mobile, convert XFile to File
             File imageFile = File(newImages[i].path);
             imageUrl = await uploadImage(imageFile);
           }
@@ -309,10 +304,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
         }
       }
 
-      // Combine existing images with newly uploaded ones
       List<String> allImageUrls = [...existingImages, ...uploadedImageUrls];
 
-      // Prepare product data
       Map<String, dynamic> productData = {
         'title': _titleController.text.trim(),
         'subtitle': _subtitleController.text.trim(),
@@ -330,7 +323,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
         'updatedAt': DateTime.now().toIso8601String(),
       };
 
-      // Update product in Firebase
       DatabaseReference productRef = FirebaseDatabase.instance
           .ref()
           .child("Products")
@@ -388,7 +380,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Basic Information Section
               _buildSectionTitle('Basic Information'),
               const SizedBox(height: 16),
               _buildTextField(
@@ -414,7 +405,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Brand & Types Section
               _buildSectionTitle('Brand & Types'),
               const SizedBox(height: 16),
               _buildBrandDropdown(),
@@ -422,7 +412,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
               _buildTypesSection(),
               const SizedBox(height: 24),
 
-              // Pricing & Inventory Section
               _buildSectionTitle('Pricing & Inventory'),
               const SizedBox(height: 16),
               Row(
@@ -464,7 +453,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Watch Specifications Section
               _buildSectionTitle('Watch Specifications'),
               const SizedBox(height: 16),
               _buildTextField(
@@ -483,7 +471,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Product Images Section
               _buildSectionTitle('Product Images'),
               const SizedBox(height: 8),
               Text(
@@ -503,7 +490,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.0),
               blurRadius: 4,
               offset: const Offset(0, -2),
             ),
@@ -519,19 +506,20 @@ class _EditProductScreenState extends State<EditProductScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
           ),
-          child: isLoading
-              ? const SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          child:
+              isLoading
+                  ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                  : const Text(
+                    'Update Product',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
-                )
-              : const Text(
-                  'Update Product',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
         ),
       ),
     );
@@ -602,12 +590,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
           vertical: 12,
         ),
       ),
-      items: availableBrands.map((brandId) {
-        return DropdownMenuItem(
-          value: brandId,
-          child: Text(getCategoryName(brandId)),
-        );
-      }).toList(),
+      items:
+          availableBrands.map((brandId) {
+            return DropdownMenuItem(
+              value: brandId,
+              child: Text(getCategoryName(brandId)),
+            );
+          }).toList(),
       onChanged: (value) {
         setState(() {
           selectedBrand = value;
@@ -654,40 +643,42 @@ class _EditProductScreenState extends State<EditProductScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
-            children: availableTypes.map((typeId) {
-              final isSelected = selectedTypes.contains(typeId);
-              return Container(
-                decoration: BoxDecoration(
-                  border: availableTypes.last != typeId
-                      ? Border(
-                          bottom: BorderSide(color: Colors.grey.shade200),
-                        )
-                      : null,
-                ),
-                child: CheckboxListTile(
-                  title: Text(
-                    getCategoryName(typeId),
-                    style: const TextStyle(fontSize: 14),
-                  ),
-                  value: isSelected,
-                  onChanged: (bool? value) {
-                    setState(() {
-                      if (value == true) {
-                        if (!selectedTypes.contains(typeId)) {
-                          selectedTypes.add(typeId);
-                        }
-                      } else {
-                        selectedTypes.remove(typeId);
-                      }
-                    });
-                  },
-                  activeColor: const Color(0xFF5B8A9A),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                  ),
-                ),
-              );
-            }).toList(),
+            children:
+                availableTypes.map((typeId) {
+                  final isSelected = selectedTypes.contains(typeId);
+                  return Container(
+                    decoration: BoxDecoration(
+                      border:
+                          availableTypes.last != typeId
+                              ? Border(
+                                bottom: BorderSide(color: Colors.grey.shade200),
+                              )
+                              : null,
+                    ),
+                    child: CheckboxListTile(
+                      title: Text(
+                        getCategoryName(typeId),
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      value: isSelected,
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            if (!selectedTypes.contains(typeId)) {
+                              selectedTypes.add(typeId);
+                            }
+                          } else {
+                            selectedTypes.remove(typeId);
+                          }
+                        });
+                      },
+                      activeColor: const Color(0xFF5B8A9A),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         ),
       ],
@@ -703,7 +694,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: Container(
               height: 60,
               decoration: BoxDecoration(
-                color: const Color(0xFF5B8A9A).withOpacity(0.1),
+                color: const Color(0xFF5B8A9A).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: const Color(0xFF5B8A9A),
@@ -854,30 +845,31 @@ class _EditProductScreenState extends State<EditProductScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
-            child: kIsWeb
-                ? Image.network(
-                    newImages[index].path,
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Center(
-                        child: Icon(Icons.broken_image, color: Colors.grey),
-                      );
-                    },
-                  )
-                : Image.file(
-                    File(newImages[index].path),
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: double.infinity,
-                  ),
+            child:
+                kIsWeb
+                    ? Image.network(
+                      newImages[index].path,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        );
+                      },
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Icon(Icons.broken_image, color: Colors.grey),
+                        );
+                      },
+                    )
+                    : Image.file(
+                      File(newImages[index].path),
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    ),
           ),
           Positioned(
             top: 4,

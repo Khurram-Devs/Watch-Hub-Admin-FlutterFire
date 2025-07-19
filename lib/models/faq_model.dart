@@ -5,11 +5,7 @@ class FAQModel {
   final String question;
   final String answer;
 
-  FAQModel({
-    required this.id,
-    required this.question,
-    required this.answer,
-  });
+  FAQModel({required this.id, required this.question, required this.answer});
 
   factory FAQModel.fromDoc(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
@@ -21,9 +17,6 @@ class FAQModel {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'question': question,
-      'answer': answer,
-    };
+    return {'question': question, 'answer': answer};
   }
 }

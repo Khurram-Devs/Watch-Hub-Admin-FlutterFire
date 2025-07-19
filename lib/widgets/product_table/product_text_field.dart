@@ -22,7 +22,9 @@ class ProductTextField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         maxLines: maxLines,
-        validator: (value) => (value == null || value.trim().isEmpty) ? 'Required' : null,
+        validator:
+            (value) =>
+                (value == null || value.trim().isEmpty) ? 'Required' : null,
         decoration: InputDecoration(
           labelText: label,
           border: OutlineInputBorder(),

@@ -113,7 +113,7 @@ class _ManagersScreenState extends State<ManagersScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: roleColor.withOpacity(0.1),
+                      color: roleColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
@@ -134,7 +134,7 @@ class _ManagersScreenState extends State<ManagersScreen> {
             ),
             IconButton(
               icon: const Icon(Icons.delete, color: Colors.red),
-              onPressed: docId == null ? null : () => _deleteManager(docId!),
+              onPressed: docId == null ? null : () => _deleteManager(docId),
             ),
           ],
         ),

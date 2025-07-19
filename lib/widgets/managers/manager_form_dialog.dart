@@ -27,7 +27,7 @@ class _ManagerFormDialogState extends State<ManagerFormDialog> {
   @override
   void initState() {
     super.initState();
-  if (widget.manager != null) {
+    if (widget.manager != null) {
       _idController.text = widget.manager!.id;
       _passwordController.text = widget.manager!.password;
       _selectedRole = widget.manager!.role;
@@ -44,7 +44,7 @@ class _ManagerFormDialogState extends State<ManagerFormDialog> {
       id: _idController.text.trim(),
       password: _passwordController.text.trim(),
       role: _selectedRole!,
-      createdAt: widget.manager?.createdAt ?? DateTime.now(), // <- required
+      createdAt: widget.manager?.createdAt ?? DateTime.now(),
     );
 
     if (widget.docId != null) {
@@ -84,10 +84,22 @@ class _ManagerFormDialogState extends State<ManagerFormDialog> {
               value: _selectedRole,
               decoration: const InputDecoration(labelText: 'Role'),
               items: const [
-                DropdownMenuItem(value: 'PRODUCT MANAGER', child: Text('Product Manager')),
-                DropdownMenuItem(value: 'BRANDS MANAGER', child: Text('Brands Manager')),
-                DropdownMenuItem(value: 'CUSTOMER SERVICE', child: Text('Customer Service')),
-                DropdownMenuItem(value: 'ORDERS MANAGER', child: Text('Orders Manager')),
+                DropdownMenuItem(
+                  value: 'PRODUCT MANAGER',
+                  child: Text('Product Manager'),
+                ),
+                DropdownMenuItem(
+                  value: 'BRANDS MANAGER',
+                  child: Text('Brands Manager'),
+                ),
+                DropdownMenuItem(
+                  value: 'CUSTOMER SERVICE',
+                  child: Text('Customer Service'),
+                ),
+                DropdownMenuItem(
+                  value: 'ORDERS MANAGER',
+                  child: Text('Orders Manager'),
+                ),
                 DropdownMenuItem(
                   value: 'SUPER ADMIN',
                   child: Text('Super Admin'),

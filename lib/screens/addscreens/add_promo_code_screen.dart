@@ -67,7 +67,9 @@ class _AddPromoCodeScreenState extends State<AddPromoCodeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.promoToEdit == null ? "Add Promo Code" : "Edit Promo Code"),
+        title: Text(
+          widget.promoToEdit == null ? "Add Promo Code" : "Edit Promo Code",
+        ),
         backgroundColor: const Color(0xFF5B8A9A),
         foregroundColor: Colors.white,
       ),
@@ -80,23 +82,27 @@ class _AddPromoCodeScreenState extends State<AddPromoCodeScreen> {
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(labelText: "Title"),
-                validator: (val) => val == null || val.isEmpty ? "Required" : null,
+                validator:
+                    (val) => val == null || val.isEmpty ? "Required" : null,
               ),
               TextFormField(
                 controller: _codeController,
                 decoration: const InputDecoration(labelText: "Code"),
-                validator: (val) => val == null || val.isEmpty ? "Required" : null,
+                validator:
+                    (val) => val == null || val.isEmpty ? "Required" : null,
               ),
               TextFormField(
                 controller: _percentController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: "Discount %"),
-                validator: (val) => val == null || val.isEmpty ? "Required" : null,
+                validator:
+                    (val) => val == null || val.isEmpty ? "Required" : null,
               ),
               TextFormField(
                 controller: _limitController,
                 decoration: const InputDecoration(labelText: "Limit"),
-                validator: (val) => val == null || val.isEmpty ? "Required" : null,
+                validator:
+                    (val) => val == null || val.isEmpty ? "Required" : null,
               ),
               const SizedBox(height: 20),
               ElevatedButton(

@@ -15,7 +15,6 @@ class CategoryModel {
     required this.createdAt,
   });
 
-  // ✅ Add this:
   CategoryModel copyWith({
     String? id,
     String? name,

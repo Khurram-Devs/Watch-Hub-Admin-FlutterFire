@@ -10,11 +10,12 @@ class OrderService {
 
     for (var userDoc in usersSnapshot.docs) {
       final userId = userDoc.id;
-      final ordersSnapshot = await _firestore
-          .collection('usersProfile')
-          .doc(userId)
-          .collection('orders')
-          .get();
+      final ordersSnapshot =
+          await _firestore
+              .collection('usersProfile')
+              .doc(userId)
+              .collection('orders')
+              .get();
 
       for (var orderDoc in ordersSnapshot.docs) {
         final data = orderDoc.data();
@@ -26,7 +27,11 @@ class OrderService {
     return allOrders;
   }
 
-  static Future<void> updateOrderStatus(String userId, String orderId, String status) async {
+  static Future<void> updateOrderStatus(
+    String userId,
+    String orderId,
+    String status,
+  ) async {
     final orderRef = _firestore
         .collection('usersProfile')
         .doc(userId)
@@ -35,7 +40,6 @@ class OrderService {
 
     await orderRef.update({'status': status});
 
-    // Add notification after status update
     final notification = _getNotificationForStatus(status, orderId);
     if (notification != null) {
       await _firestore
@@ -43,16 +47,19 @@ class OrderService {
           .doc(userId)
           .collection('notifications')
           .add({
-        'title': notification['title'],
-        'message': notification['message'],
-        'type': notification['type'],
-        'isRead': false,
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+            'title': notification['title'],
+            'message': notification['message'],
+            'type': notification['type'],
+            'isRead': false,
+            'createdAt': FieldValue.serverTimestamp(),
+          });
     }
   }
 
-  static Map<String, String>? _getNotificationForStatus(String status, String orderId) {
+  static Map<String, String>? _getNotificationForStatus(
+    String status,
+    String orderId,
+  ) {
     switch (status.toLowerCase()) {
       case 'pending':
         return {

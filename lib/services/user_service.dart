@@ -9,7 +9,9 @@ class UserService {
     return snap.docs.map((doc) => UserModel.fromDoc(doc)).toList();
   }
 
-  static Future<Map<String, Map<String, String>>> fetchUserDetails(Set<String> userIds) async {
+  static Future<Map<String, Map<String, String>>> fetchUserDetails(
+    Set<String> userIds,
+  ) async {
     final Map<String, Map<String, String>> details = {};
     if (userIds.isEmpty) return details;
 

@@ -4,7 +4,11 @@ class SpecsEditor extends StatefulWidget {
   final Map<String, dynamic> initialSpecs;
   final void Function(Map<String, dynamic>) onSpecsChanged;
 
-  const SpecsEditor({super.key, required this.initialSpecs, required this.onSpecsChanged});
+  const SpecsEditor({
+    super.key,
+    required this.initialSpecs,
+    required this.onSpecsChanged,
+  });
 
   @override
   State<SpecsEditor> createState() => _SpecsEditorState();
@@ -47,52 +51,68 @@ class _SpecsEditorState extends State<SpecsEditor> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Specifications", style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text(
+          "Specifications",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
         const SizedBox(height: 8),
         ListView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _keys.length,
-          itemBuilder: (context, index) => Row(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                  child: TextField(
-                    controller: _keys[index],
-                    decoration: const InputDecoration(labelText: 'Key', border: OutlineInputBorder()),
-                    onChanged: (_) => _updateSpecs(),
+          itemBuilder:
+              (context, index) => Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 4,
+                      ),
+                      child: TextField(
+                        controller: _keys[index],
+                        decoration: const InputDecoration(
+                          labelText: 'Key',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (_) => _updateSpecs(),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
-                  child: TextField(
-                    controller: _values[index],
-                    decoration: const InputDecoration(labelText: 'Value', border: OutlineInputBorder()),
-                    onChanged: (_) => _updateSpecs(),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 4,
+                        horizontal: 4,
+                      ),
+                      child: TextField(
+                        controller: _values[index],
+                        decoration: const InputDecoration(
+                          labelText: 'Value',
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (_) => _updateSpecs(),
+                      ),
+                    ),
                   ),
-                ),
+                  IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.redAccent),
+                    onPressed: () {
+                      setState(() {
+                        _keys.removeAt(index);
+                        _values.removeAt(index);
+                        _updateSpecs();
+                      });
+                    },
+                  ),
+                ],
               ),
-              IconButton(
-                icon: const Icon(Icons.delete, color: Colors.redAccent),
-                onPressed: () {
-                  setState(() {
-                    _keys.removeAt(index);
-                    _values.removeAt(index);
-                    _updateSpecs();
-                  });
-                },
-              )
-            ],
-          ),
         ),
         TextButton.icon(
           onPressed: _addSpecField,
           icon: const Icon(Icons.add),
           label: const Text("Add Spec"),
-        )
+        ),
       ],
     );
   }

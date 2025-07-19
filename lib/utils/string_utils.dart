@@ -4,8 +4,5 @@ String capitalize(String input) {
 }
 
 String capitalizeEachWord(String input) {
-  return input
-      .split(' ')
-      .map((word) => capitalize(word))
-      .join(' ');
+  return input.split(' ').map((word) => capitalize(word)).join(' ');
 }

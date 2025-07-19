@@ -81,7 +81,6 @@ class _AddBrandScreenState extends State<AddBrandScreen> {
           key: _formKey,
           child: ListView(
             children: [
-              // Name Field
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Brand Name'),
@@ -93,7 +92,6 @@ class _AddBrandScreenState extends State<AddBrandScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Type Dropdown
               DropdownButtonFormField<int>(
                 value: _selectedType,
                 items: const [
@@ -105,7 +103,6 @@ class _AddBrandScreenState extends State<AddBrandScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Icon Picker
               GestureDetector(
                 onTap: _pickIconImage,
                 child: Container(
@@ -151,7 +148,6 @@ class _AddBrandScreenState extends State<AddBrandScreen> {
               ),
               const SizedBox(height: 24),
 
-              // Submit Button
               ElevatedButton.icon(
                 onPressed: _submit,
                 icon: const Icon(Icons.save),

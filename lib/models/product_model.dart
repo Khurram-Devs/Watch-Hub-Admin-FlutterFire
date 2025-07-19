@@ -47,12 +47,14 @@ class ProductModel {
       inventoryCount: map['inventoryCount'] ?? 0,
       averageRating: map['averageRating'] ?? 0,
       totalRatings: map['totalRatings'] ?? 0,
-      brand: (map['brand'] is DocumentReference)
-          ? (map['brand'] as DocumentReference).id
-          : map['brand'],
-      categories: (map['categories'] as List? ?? [])
-          .map((c) => (c is DocumentReference) ? c.id : c.toString())
-          .toList(),
+      brand:
+          (map['brand'] is DocumentReference)
+              ? (map['brand'] as DocumentReference).id
+              : map['brand'],
+      categories:
+          (map['categories'] as List? ?? [])
+              .map((c) => (c is DocumentReference) ? c.id : c.toString())
+              .toList(),
       specs: Map<String, dynamic>.from(map['specs'] ?? {}),
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (map['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),

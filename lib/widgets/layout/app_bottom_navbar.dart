@@ -12,7 +12,6 @@ class AppBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
@@ -30,14 +29,8 @@ class AppBottomNavBar extends StatelessWidget {
           icon: Icon(Icons.inventory_2),
           label: 'Products',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.receipt),
-          label: 'Orders',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person),
-          label: 'Profile',
-        ),
+        BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Orders'),
+        BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
     );
   }

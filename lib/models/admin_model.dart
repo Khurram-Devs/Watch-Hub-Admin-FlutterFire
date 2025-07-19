@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class AdminModel {
   final String id;
   final String password;
-  final String role; // e.g., 'SUPER ADMIN', 'MANAGER'
+  final String role;
   final DateTime createdAt;
 
   AdminModel({
@@ -26,7 +26,7 @@ class AdminModel {
     return {
       'id': id,
       'password': password,
-      'role': role.toUpperCase(), // Consistent role naming
+      'role': role.toUpperCase(),
       'createdAt': Timestamp.fromDate(createdAt),
     };
   }

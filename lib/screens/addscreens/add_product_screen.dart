@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -50,7 +49,6 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _populateForm(widget.existingProduct!);
     }
   }
-  
 
   Future<void> _loadCategories() async {
     final brands = await CategoryService.fetchByType(1);
@@ -60,25 +58,29 @@ class _AddProductScreenState extends State<AddProductScreen> {
       _categories = categories;
     });
   }
-void _populateForm(ProductModel product) {
-  _controllers['title']!.text = product.title;
-  _controllers['subtitle']!.text = product.subtitle;
-  _controllers['description']!.text = product.description;
-  _controllers['price']!.text = product.price.toString();
-  _controllers['discountPercentage']!.text = product.discountPercentage.toString();
-  _controllers['inventoryCount']!.text = product.inventoryCount.toString();
-  _uploadedImageUrls = product.images;
-  _specs = product.specs;
 
-  _selectedBrand = _brands.isEmpty
-      ? null
-      : _brands.firstWhere(
-          (b) => b.id == product.brand,
-          orElse: () => _brands.first,
-        );
+  void _populateForm(ProductModel product) {
+    _controllers['title']!.text = product.title;
+    _controllers['subtitle']!.text = product.subtitle;
+    _controllers['description']!.text = product.description;
+    _controllers['price']!.text = product.price.toString();
+    _controllers['discountPercentage']!.text =
+        product.discountPercentage.toString();
+    _controllers['inventoryCount']!.text = product.inventoryCount.toString();
+    _uploadedImageUrls = product.images;
+    _specs = product.specs;
 
-  _selectedCategories = _categories.where((c) => product.categories.contains(c.id)).toList();
-}
+    _selectedBrand =
+        _brands.isEmpty
+            ? null
+            : _brands.firstWhere(
+              (b) => b.id == product.brand,
+              orElse: () => _brands.first,
+            );
+
+    _selectedCategories =
+        _categories.where((c) => product.categories.contains(c.id)).toList();
+  }
 
   Future<List<String>> _uploadImagesToImgbb(List<XFile> files) async {
     List<String> urls = [];

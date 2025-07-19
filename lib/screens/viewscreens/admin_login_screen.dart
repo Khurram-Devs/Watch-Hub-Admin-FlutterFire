@@ -49,8 +49,6 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       backgroundColor: Colors.grey[100],
       body: Center(
@@ -60,9 +58,14 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
             constraints: const BoxConstraints(maxWidth: 400),
             child: Card(
               elevation: 8,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 32,
+                ),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -70,7 +73,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     children: [
                       const Text(
                         "Admin Login",
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 24),
 
@@ -79,7 +85,10 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Text(
                             _error!,
-                            style: const TextStyle(color: Colors.red, fontSize: 14),
+                            style: const TextStyle(
+                              color: Colors.red,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
 
@@ -87,9 +96,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         controller: _idController,
                         decoration: InputDecoration(
                           labelText: 'Admin ID',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-                        validator: (val) => val == null || val.isEmpty ? 'Enter your admin ID' : null,
+                        validator:
+                            (val) =>
+                                val == null || val.isEmpty
+                                    ? 'Enter your admin ID'
+                                    : null,
                       ),
                       const SizedBox(height: 16),
 
@@ -98,9 +113,15 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                         obscureText: true,
                         decoration: InputDecoration(
                           labelText: 'Password',
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
-                        validator: (val) => val == null || val.isEmpty ? 'Enter your password' : null,
+                        validator:
+                            (val) =>
+                                val == null || val.isEmpty
+                                    ? 'Enter your password'
+                                    : null,
                       ),
                       const SizedBox(height: 24),
 
@@ -110,15 +131,24 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                           onPressed: _isLoading ? null : _login,
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                           ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                                )
-                              : const Text('Login', style: TextStyle(fontSize: 16)),
+                          child:
+                              _isLoading
+                                  ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                  : const Text(
+                                    'Login',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
                         ),
                       ),
                     ],

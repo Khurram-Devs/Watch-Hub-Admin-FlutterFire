@@ -2,7 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:watch_hub_ep/models/faq_model.dart';
 
 class FAQService {
-  static final _faqCollection = FirebaseFirestore.instance.collection('productFAQ');
+  static final _faqCollection = FirebaseFirestore.instance.collection(
+    'productFAQ',
+  );
 
   static Future<List<FAQModel>> fetchAll() async {
     final snapshot = await _faqCollection.orderBy('question').get();

@@ -55,16 +55,32 @@ class _FilterDialogState extends State<FilterDialog> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildDropdown('Brand', _brand, widget.brandOptions, (val) => setState(() => _brand = val)),
-              _buildDropdown('Category', _category, widget.categoryOptions, (val) => setState(() => _category = val)),
+              _buildDropdown(
+                'Brand',
+                _brand,
+                widget.brandOptions,
+                (val) => setState(() => _brand = val),
+              ),
+              _buildDropdown(
+                'Category',
+                _category,
+                widget.categoryOptions,
+                (val) => setState(() => _category = val),
+              ),
               const SizedBox(height: 12),
-              const Text('Price Range:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Price Range:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               RangeSlider(
                 values: RangeValues(_minPrice, _maxPrice),
                 min: 0,
                 max: 10000,
                 divisions: 100,
-                labels: RangeLabels('\$${_minPrice.toStringAsFixed(0)}', '\$${_maxPrice.toStringAsFixed(0)}'),
+                labels: RangeLabels(
+                  '\$${_minPrice.toStringAsFixed(0)}',
+                  '\$${_maxPrice.toStringAsFixed(0)}',
+                ),
                 onChanged: (values) {
                   setState(() {
                     _minPrice = values.start;
@@ -74,7 +90,12 @@ class _FilterDialogState extends State<FilterDialog> {
               ),
               const SizedBox(height: 12),
               _buildDropdown('Sort By', _sortBy, const [
-                'newest', 'oldest', 'priceAsc', 'priceDesc', 'nameAsc', 'nameDesc'
+                'newest',
+                'oldest',
+                'priceAsc',
+                'priceDesc',
+                'nameAsc',
+                'nameDesc',
               ], (val) => setState(() => _sortBy = val)),
             ],
           ),
@@ -108,28 +129,32 @@ class _FilterDialogState extends State<FilterDialog> {
     );
   }
 
-Widget _buildDropdown(
-  String label,
-  String value,
-  List<String> options,
-  ValueChanged<String> onChanged,
-) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-      DropdownButton<String>(
-        value: value,
-        isExpanded: true,
-        onChanged: (val) => onChanged(val!),
-        items: options.map(
-          (opt) => DropdownMenuItem(
-            value: opt,
-            child: Text(capitalizeEachWord(opt)),
-          ),
-        ).toList(),
-      ),
-      const SizedBox(height: 12),
-    ],
-  );
-}}
+  Widget _buildDropdown(
+    String label,
+    String value,
+    List<String> options,
+    ValueChanged<String> onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+        DropdownButton<String>(
+          value: value,
+          isExpanded: true,
+          onChanged: (val) => onChanged(val!),
+          items:
+              options
+                  .map(
+                    (opt) => DropdownMenuItem(
+                      value: opt,
+                      child: Text(capitalizeEachWord(opt)),
+                    ),
+                  )
+                  .toList(),
+        ),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+}
