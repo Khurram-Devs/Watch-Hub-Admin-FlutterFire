@@ -31,7 +31,7 @@ class AdminLayout extends StatelessWidget {
         context.go('/products');
         break;
       case 1:
-        context.go('/brands');
+        context.go('/categories');
         break;
       case 2:
         context.go('/testimonials');
@@ -54,13 +54,11 @@ class AdminLayout extends StatelessWidget {
       case 8:
         context.go('/managers');
         break;
-
       case 99:
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('role');
         currentAdminRole = null;
         loginStateNotifier.value = false;
-
         if (context.mounted) {
           context.go('/login');
         }
@@ -90,7 +88,7 @@ class AdminLayout extends StatelessWidget {
       case 0:
         return role == 'SUPER ADMIN' || role == 'PRODUCT MANAGER';
       case 1:
-        return role == 'SUPER ADMIN' || role == 'BRANDS MANAGER';
+        return role == 'SUPER ADMIN' || role == 'CATEGORY MANAGER';
       case 2:
       case 3:
         return role == 'SUPER ADMIN' || role == 'CUSTOMER SERVICE';
@@ -109,6 +107,64 @@ class AdminLayout extends StatelessWidget {
     }
   }
 
+  List<Map<String, dynamic>> _getBottomNavTabs() {
+    final tabs = <Map<String, dynamic>>[];
+
+    if (role == 'SUPER ADMIN') {
+      tabs.add({
+        'index': 0,
+        'icon': Icons.dashboard,
+        'label': 'Dashboard',
+      });
+      tabs.add({
+        'index': 2,
+        'icon': Icons.watch,
+        'label': 'Products',
+      });
+      tabs.add({
+        'index': 1,
+        'icon': Icons.receipt,
+        'label': 'Orders',
+      });
+      tabs.add({'index': 6, 'icon': Icons.people, 'label': 'Users'}); // /users
+    }
+
+    else if (role == 'PRODUCT MANAGER') {
+      tabs.add({'index': 0, 'icon': Icons.dashboard, 'label': 'Dashboard'});
+      tabs.add({'index': 2, 'icon': Icons.watch, 'label': 'Products'});
+      tabs.add({'index': 4, 'icon': Icons.question_answer, 'label': 'FAQ'});
+      tabs.add({'index': 5, 'icon': Icons.discount, 'label': 'Promo Codes'});
+    }
+
+    else if (role == 'CATEGORY MANAGER') {
+      tabs.add({'index': 0, 'icon': Icons.dashboard, 'label': 'Dashboard'});
+      tabs.add({'index': 1, 'icon': Icons.category, 'label': 'Categories'});
+      tabs.add({'index': 4, 'icon': Icons.question_answer, 'label': 'FAQ'});
+    }
+
+    else if (role == 'CUSTOMER SERVICE') {
+      tabs.add({'index': 0, 'icon': Icons.dashboard, 'label': 'Dashboard'});
+      tabs.add({'index': 2, 'icon': Icons.reviews, 'label': 'Testimonials'});
+      tabs.add({'index': 3, 'icon': Icons.message, 'label': 'Messages'});
+    }
+
+    else if (role == 'ORDERS MANAGER') {
+      tabs.add({'index': 0, 'icon': Icons.dashboard, 'label': 'Dashboard'});
+      tabs.add({'index': 1, 'icon': Icons.receipt, 'label': 'Orders'});
+      tabs.add({'index': 6, 'icon': Icons.people, 'label': 'Users'});
+      tabs.add({'index': 3, 'icon': Icons.message, 'label': 'Messages'});
+    }
+
+    return tabs.take(4).toList();
+  }
+
+  int _getBottomNavIndex(int? rawIndex) {
+    final tabs = _getBottomNavTabs();
+    if (rawIndex == null) return 0;
+    final tabIndex = tabs.indexWhere((tab) => tab['index'] == rawIndex);
+    return tabIndex != -1 ? tabIndex : 0;
+  }
+
   Widget _buildDrawerItem(
     BuildContext context,
     String title,
@@ -117,7 +173,6 @@ class AdminLayout extends StatelessWidget {
     int badgeCount = 0,
   }) {
     if (index != 99 && !_canAccess(index)) return const SizedBox.shrink();
-
     final isSelected = drawerIndex == index;
 
     final iconWidget =
@@ -134,7 +189,7 @@ class AdminLayout extends StatelessWidget {
 
     return ListTile(
       selected: isSelected,
-      selectedTileColor: Color(0xFF5B8A9A),
+      selectedTileColor: const Color(0xFF5B8A9A),
       leading: iconWidget,
       title: Text(title),
       onTap: () => _onDrawerTap(context, index),
@@ -143,6 +198,8 @@ class AdminLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tabs = _getBottomNavTabs();
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -160,7 +217,7 @@ class AdminLayout extends StatelessWidget {
               ),
           ],
         ),
-        backgroundColor: Color(0xFF5B8A9A),
+        backgroundColor: const Color(0xFF5B8A9A),
         foregroundColor: Colors.white,
         elevation: 0,
       ),
@@ -177,7 +234,7 @@ class AdminLayout extends StatelessWidget {
                 children: [
                   const Text(
                     'Admin Panel',
-                    style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                     textAlign: TextAlign.center,
                   ),
                   Text(
@@ -188,7 +245,7 @@ class AdminLayout extends StatelessWidget {
                               ? Colors.redAccent
                               : role.toUpperCase() == 'PRODUCT MANAGER'
                               ? Colors.deepPurple
-                              : role.toUpperCase() == 'BRANDS MANAGER'
+                              : role.toUpperCase() == 'CATEGORY MANAGER'
                               ? Colors.teal
                               : role.toUpperCase() == 'CUSTOMER SERVICE'
                               ? Colors.orange
@@ -196,16 +253,20 @@ class AdminLayout extends StatelessWidget {
                               ? Colors.lightGreen
                               : Colors.grey,
                       fontSize: 16,
-                      fontWeight: FontWeight.w900
+                      fontWeight: FontWeight.w900,
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ],
               ),
             ),
-
             _buildDrawerItem(context, 'Products', Icons.watch, 0),
-            _buildDrawerItem(context, 'Brands', Icons.branding_watermark, 1),
+            _buildDrawerItem(
+              context,
+              'Categories',
+              Icons.branding_watermark,
+              1,
+            ),
             _buildDrawerItem(context, 'Testimonials', Icons.reviews, 2),
             _buildDrawerItem(
               context,
@@ -237,27 +298,27 @@ class AdminLayout extends StatelessWidget {
         ),
       ),
       body: body,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex:
-            (bottomNavIndex != null &&
-                    bottomNavIndex! >= 0 &&
-                    bottomNavIndex! < 4)
-                ? bottomNavIndex!
-                : 0,
-        onTap: (i) => _onBottomTap(context, i),
-        selectedItemColor: Color(0xFF5B8A9A),
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Orders'),
-          BottomNavigationBarItem(icon: Icon(Icons.watch), label: 'Products'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Users'),
-        ],
-      ),
+      bottomNavigationBar:
+          tabs.length >= 2
+              ? BottomNavigationBar(
+                currentIndex: _getBottomNavIndex(bottomNavIndex),
+                onTap: (i) {
+                  if (i < tabs.length) {
+                    _onBottomTap(context, tabs[i]['index']);
+                  }
+                },
+                selectedItemColor: const Color(0xFF5B8A9A),
+                unselectedItemColor: Colors.grey,
+                type: BottomNavigationBarType.fixed,
+                items:
+                    tabs.map((tab) {
+                      return BottomNavigationBarItem(
+                        icon: Icon(tab['icon'] as IconData),
+                        label: tab['label'] as String,
+                      );
+                    }).toList(),
+              )
+              : null,
     );
   }
 }

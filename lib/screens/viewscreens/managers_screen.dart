@@ -72,7 +72,7 @@ class _ManagersScreenState extends State<ManagersScreen> {
         return Colors.redAccent;
       case 'PRODUCT MANAGER':
         return Colors.deepPurple;
-      case 'BRANDS MANAGER':
+      case 'CATEGORY MANAGER':
         return Colors.teal;
       case 'CUSTOMER SERVICE':
         return Colors.orange;

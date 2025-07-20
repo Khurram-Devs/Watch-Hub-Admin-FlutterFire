@@ -10,7 +10,7 @@ import 'screens/viewscreens/admin_login_screen.dart';
 import 'screens/viewscreens/products_screen.dart';
 import 'screens/viewscreens/orders_screen.dart';
 import 'screens/viewscreens/users_screen.dart';
-import 'screens/viewscreens/brands_screen.dart';
+import 'screens/viewscreens/categories_screen.dart';
 import 'screens/viewscreens/testimonials_screen.dart';
 import 'screens/viewscreens/contact_messages_screen.dart';
 import 'screens/viewscreens/product_faq_screen.dart';
@@ -104,14 +104,14 @@ class MyApp extends StatelessWidget {
               ),
         ),
         GoRoute(
-          path: '/brands',
+          path: '/categories',
           builder:
               (_, __) => AdminLayout(
                 role: currentAdminRole!,
-                title: 'Brands',
+                title: 'Categories',
                 drawerIndex: 1,
                 bottomNavIndex: null,
-                body: const BrandsScreen(),
+                body: const CategoriesScreen(),
               ),
         ),
         GoRoute(

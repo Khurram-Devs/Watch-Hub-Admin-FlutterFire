@@ -89,8 +89,8 @@ class _ManagerFormDialogState extends State<ManagerFormDialog> {
                   child: Text('Product Manager'),
                 ),
                 DropdownMenuItem(
-                  value: 'BRANDS MANAGER',
-                  child: Text('Brands Manager'),
+                  value: 'CATEGORY MANAGER',
+                  child: Text('Category Manager'),
                 ),
                 DropdownMenuItem(
                   value: 'CUSTOMER SERVICE',

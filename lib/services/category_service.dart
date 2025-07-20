@@ -39,6 +39,44 @@ class CategoryService {
   }
 
   static Future<void> deleteCategory(String id) async {
-    await _firestore.collection('categories').doc(id).delete();
+    final docRef = _firestore.collection('categories').doc(id);
+    final docSnap = await docRef.get();
+
+    if (!docSnap.exists) return;
+
+    final data = docSnap.data()!;
+    final int type = data['type'] ?? 0;
+
+    await docRef.delete();
+
+    final productsSnap = await _firestore.collection('products').get();
+
+    if (type == 1) {
+      for (final doc in productsSnap.docs) {
+        final productData = doc.data();
+        final DocumentReference? brandRef = productData['brand'];
+        if (brandRef != null && brandRef.id == id) {
+          await doc.reference.delete();
+        }
+      }
+    } else if (type == 2) {
+      for (final doc in productsSnap.docs) {
+        final productData = doc.data();
+        final List<dynamic> categoryRefs = productData['categories'] ?? [];
+
+        final hasCategory = categoryRefs.any(
+          (ref) => ref is DocumentReference && ref.id == id,
+        );
+
+        if (hasCategory) {
+          final updatedCategories =
+              categoryRefs
+                  .where((ref) => ref is DocumentReference && ref.id != id)
+                  .toList();
+
+          await doc.reference.update({'categories': updatedCategories});
+        }
+      }
+    }
   }
 }
