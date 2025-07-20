@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:watch_hub_ep/models/category_model.dart';
 import '../models/product_model.dart';
 
 class ProductService {
@@ -127,5 +128,32 @@ class ProductService {
             });
       }
     }
+  }
+
+static Future<List<CategoryModel>> getCategoriesByType(int type) async {
+  final snapshot = await _firestore
+      .collection('categories')
+      .where('type', isEqualTo: type)
+      .get();
+
+  return snapshot.docs.map((doc) {
+    return CategoryModel.fromMap(doc.data(), doc.id);
+  }).toList();
+}
+
+
+  static Stream<List<ProductModel>> listenToProducts() {
+    return FirebaseFirestore.instance
+        .collection('products')
+        .snapshots()
+        .map(
+          (snap) =>
+              snap.docs
+                  .map(
+                    (doc) =>
+                        ProductModel.fromMap({...doc.data(), 'id': doc.id}),
+                  )
+                  .toList(),
+        );
   }
 }

@@ -7,7 +7,7 @@ import 'package:watch_hub_ep/screens/viewscreens/managers_screen.dart';
 import 'firebase_options.dart';
 import 'widgets/layout/admin_layout.dart';
 import 'screens/viewscreens/admin_login_screen.dart';
-import 'screens/viewscreens/product_table_screen.dart';
+import 'screens/viewscreens/products_screen.dart';
 import 'screens/viewscreens/orders_screen.dart';
 import 'screens/viewscreens/users_screen.dart';
 import 'screens/viewscreens/brands_screen.dart';

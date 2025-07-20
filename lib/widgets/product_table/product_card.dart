@@ -123,6 +123,7 @@ class ProductCard extends StatelessWidget {
               children: [
                 Expanded(child: _info('Brand', capitalize(brandName))),
                 Expanded(child: _info('Stock', '${product.inventoryCount}')),
+                Expanded(child: _info('Discount', '${product.discountPercentage}%')),
               ],
             ),
             const SizedBox(height: 8),
