@@ -11,8 +11,8 @@ class ProductModel {
   final int inventoryCount;
   final num averageRating;
   final int totalRatings;
-  final String? brand;
-  final List<String> categories;
+  final DocumentReference? brand;
+  final List<DocumentReference> categories;
   final Map<String, dynamic> specs;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -47,14 +47,8 @@ class ProductModel {
       inventoryCount: map['inventoryCount'] ?? 0,
       averageRating: map['averageRating'] ?? 0,
       totalRatings: map['totalRatings'] ?? 0,
-      brand:
-          (map['brand'] is DocumentReference)
-              ? (map['brand'] as DocumentReference).id
-              : map['brand'],
-      categories:
-          (map['categories'] as List? ?? [])
-              .map((c) => (c is DocumentReference) ? c.id : c.toString())
-              .toList(),
+      brand: map['brand'] as DocumentReference?,
+      categories: List<DocumentReference>.from(map['categories'] ?? []),
       specs: Map<String, dynamic>.from(map['specs'] ?? {}),
       createdAt: (map['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (map['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -92,8 +86,8 @@ class ProductModel {
     int? inventoryCount,
     num? averageRating,
     int? totalRatings,
-    String? brand,
-    List<String>? categories,
+    DocumentReference? brand,
+    List<DocumentReference>? categories,
     Map<String, dynamic>? specs,
     DateTime? createdAt,
     DateTime? updatedAt,

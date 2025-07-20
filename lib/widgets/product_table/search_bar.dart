@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class ProductSearchBar extends StatelessWidget {
   final TextEditingController controller;
   final VoidCallback onFilterTap;
+  final ValueChanged<String>? onChanged;
 
   const ProductSearchBar({
     super.key,
     required this.controller,
     required this.onFilterTap,
+    this.onChanged,
   });
 
   @override
@@ -19,6 +21,8 @@ class ProductSearchBar extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
+              onChanged: onChanged,
+              onSubmitted: onChanged,
               decoration: InputDecoration(
                 hintText: 'Search...',
                 prefixIcon: const Icon(Icons.search, color: Color(0xFF5B8A9A)),
@@ -26,7 +30,10 @@ class ProductSearchBar extends StatelessWidget {
                     controller.text.isNotEmpty
                         ? IconButton(
                           icon: const Icon(Icons.clear),
-                          onPressed: controller.clear,
+                          onPressed: () {
+                            controller.clear();
+                            if (onChanged != null) onChanged!('');
+                          },
                         )
                         : null,
                 border: OutlineInputBorder(

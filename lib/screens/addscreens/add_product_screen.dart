@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:watch_hub_ep/models/product_model.dart';
 import 'package:watch_hub_ep/models/category_model.dart';
 import 'package:watch_hub_ep/services/product_service.dart';
@@ -44,10 +45,11 @@ class _AddProductScreenState extends State<AddProductScreen> {
   @override
   void initState() {
     super.initState();
-    _loadCategories();
-    if (widget.existingProduct != null) {
-      _populateForm(widget.existingProduct!);
-    }
+    _loadCategories().then((_) {
+      if (widget.existingProduct != null) {
+        _populateForm(widget.existingProduct!);
+      }
+    });
   }
 
   Future<void> _loadCategories() async {
@@ -70,16 +72,15 @@ class _AddProductScreenState extends State<AddProductScreen> {
     _uploadedImageUrls = product.images;
     _specs = product.specs;
 
-    _selectedBrand =
-        _brands.isEmpty
-            ? null
-            : _brands.firstWhere(
-              (b) => b.id == product.brand,
-              orElse: () => _brands.first,
-            );
+    final brandId = product.brand?.id;
+    _selectedBrand = _brands.firstWhere(
+      (b) => b.id == brandId,
+      orElse: () => _brands.isNotEmpty ? _brands.first : _brands[0],
+    );
 
+    final categoryIds = product.categories.map((ref) => ref.id).toSet();
     _selectedCategories =
-        _categories.where((c) => product.categories.contains(c.id)).toList();
+        _categories.where((c) => categoryIds.contains(c.id)).toList();
   }
 
   Future<List<String>> _uploadImagesToImgbb(List<XFile> files) async {
@@ -118,8 +119,16 @@ class _AddProductScreenState extends State<AddProductScreen> {
       totalRatings: widget.existingProduct?.totalRatings ?? 0,
       images: [..._uploadedImageUrls, ...newImageUrls],
       specs: _specs,
-      brand: _selectedBrand?.id,
-      categories: _selectedCategories.map((e) => e.id).toList(),
+      brand:
+          _selectedBrand == null
+              ? null
+              : FirebaseFirestore.instance.doc(
+                'categories/${_selectedBrand!.id}',
+              ),
+      categories:
+          _selectedCategories
+              .map((e) => FirebaseFirestore.instance.doc('categories/${e.id}'))
+              .toList(),
       createdAt: widget.existingProduct?.createdAt ?? DateTime.now(),
       updatedAt: DateTime.now(),
     );

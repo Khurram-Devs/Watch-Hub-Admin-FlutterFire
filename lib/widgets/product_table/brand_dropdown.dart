@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/models/category_model.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 
 class BrandDropdown extends StatelessWidget {
   final List<CategoryModel> brands;
@@ -21,7 +22,7 @@ class BrandDropdown extends StatelessWidget {
           brands
               .map(
                 (brand) =>
-                    DropdownMenuItem(value: brand, child: Text(brand.name)),
+                    DropdownMenuItem(value: brand, child: Text(capitalize(brand.name))),
               )
               .toList(),
       onChanged: onChanged,

@@ -8,8 +8,7 @@ class ImagePickerField extends StatelessWidget {
   final List<String> initialUrls;
   final int maxImages;
   final List<XFile> pickedFiles;
-  final void Function(List<String> urls, List<XFile> pickedFiles)
-  onImagesSelected;
+  final void Function(List<String> urls, List<XFile> pickedFiles) onImagesSelected;
 
   const ImagePickerField({
     super.key,
@@ -46,18 +45,33 @@ class ImagePickerField extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            ...initialUrls.map(
-              (url) =>
-                  _buildImagePreview(Image.network(url, fit: BoxFit.cover)),
+            ...initialUrls.asMap().entries.map(
+              (entry) => _buildRemovableImage(
+                context,
+                Image.network(entry.value, fit: BoxFit.cover),
+                () {
+                  final updatedUrls = List<String>.from(initialUrls);
+                  updatedUrls.removeAt(entry.key);
+                  onImagesSelected(updatedUrls, pickedFiles);
+                },
+              ),
             ),
 
-            ...pickedFiles.map(
-              (file) => FutureBuilder<Widget>(
-                future: _buildPreview(file),
+            ...pickedFiles.asMap().entries.map(
+              (entry) => FutureBuilder<Widget>(
+                future: _buildPreview(entry.value),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done &&
                       snapshot.hasData) {
-                    return _buildImagePreview(snapshot.data!);
+                    return _buildRemovableImage(
+                      context,
+                      snapshot.data!,
+                      () {
+                        final updatedPicked = List<XFile>.from(pickedFiles);
+                        updatedPicked.removeAt(entry.key);
+                        onImagesSelected(initialUrls, updatedPicked);
+                      },
+                    );
                   }
                   return const SizedBox(
                     width: 80,
@@ -95,6 +109,29 @@ class ImagePickerField extends StatelessWidget {
     );
   }
 
+  Widget _buildRemovableImage(BuildContext context, Widget image, VoidCallback onRemove) {
+    return Stack(
+      children: [
+        _buildImagePreview(image),
+        Positioned(
+          top: 0,
+          right: 0,
+          child: GestureDetector(
+            onTap: onRemove,
+            child: Container(
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.6),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.close, size: 16, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildImagePreview(Widget imageWidget) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
@@ -104,7 +141,7 @@ class ImagePickerField extends StatelessWidget {
         decoration: BoxDecoration(
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 4,
               offset: const Offset(0, 2),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/models/category_model.dart';
+import 'package:watch_hub_ep/utils/string_utils.dart';
 
 class CategoriesMultiSelect extends StatelessWidget {
   final List<CategoryModel> categories;
@@ -21,7 +22,7 @@ class CategoriesMultiSelect extends StatelessWidget {
           categories.map((cat) {
             final isSelected = selectedCategories.contains(cat);
             return FilterChip(
-              label: Text(cat.name),
+              label: Text(capitalizeEachWord(cat.name)),
               selected: isSelected,
               onSelected: (selected) {
                 final updated = List<CategoryModel>.from(selectedCategories);

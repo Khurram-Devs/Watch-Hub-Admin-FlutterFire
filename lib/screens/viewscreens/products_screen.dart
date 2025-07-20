@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../models/product_model.dart';
 import '../../models/category_model.dart';
@@ -135,23 +136,39 @@ class _ProductTableScreenState extends State<ProductTableScreen> {
     if (search.isNotEmpty) {
       temp =
           temp.where((p) {
-            final brand = _getBrandName(p.brand).toLowerCase();
+            final brandName = _getBrandName(p.brand).toLowerCase();
+            final categoryNames = _getCategoryNames(p.categories).toLowerCase();
+            final priceStr = p.price.toString();
+            final discountStr = '${p.discountPercentage}%';
+
             return p.title.toLowerCase().contains(search) ||
                 p.subtitle.toLowerCase().contains(search) ||
-                brand.contains(search);
+                brandName.contains(search) ||
+                categoryNames.contains(search) ||
+                priceStr.contains(search) ||
+                discountStr.contains(search);
           }).toList();
     }
 
     if (selectedBrand != 'All') {
+      final selectedBrandLower = selectedBrand.toLowerCase();
       temp =
-          temp.where((p) => _getBrandName(p.brand) == selectedBrand).toList();
+          temp.where((p) {
+            final brandName = _getBrandName(p.brand).toLowerCase();
+            return brandName == selectedBrandLower;
+          }).toList();
     }
 
     if (selectedCategory != 'All') {
+      final selectedCategoryLower = selectedCategory.toLowerCase();
+
       temp =
           temp.where((p) {
-            return p.categories.any((id) {
-              return categories[id]?.name == selectedCategory;
+            return p.categories.any((ref) {
+              final cat = categories[ref.id];
+              return cat != null &&
+                  cat.type == 2 && // Ensures it's a category, not a brand
+                  cat.name.toLowerCase() == selectedCategoryLower;
             });
           }).toList();
     }
@@ -183,44 +200,43 @@ class _ProductTableScreenState extends State<ProductTableScreen> {
   }
 
   void _openFilterDialog() async {
-  // Fetch brands and categories separately
-  final brands = await ProductService.getCategoriesByType(1); // type 1 = brand
-  final cats = await ProductService.getCategoriesByType(2);  // type 2 = category
+    final brands = await ProductService.getCategoriesByType(1);
+    final cats = await ProductService.getCategoriesByType(2);
 
-  // Open dialog with separate lists
-  showDialog(
-    context: context,
-    builder: (_) => FilterDialog(
-      selectedBrand: selectedBrand,
-      selectedCategory: selectedCategory,
-      minPrice: minPrice,
-      maxPrice: maxPrice,
-      sortBy: sortBy,
-      brandOptions: ['All', ...brands.map((b) => b.name)],
-      categoryOptions: ['All', ...cats.map((c) => c.name)],
-      onApply: (b, c, min, max, s) {
-        setState(() {
-          selectedBrand = b;
-          selectedCategory = c;
-          minPrice = min;
-          maxPrice = max;
-          sortBy = s;
-        });
-        _applyFilters();
-      },
-    ),
-  );
-}
+    showDialog(
+      context: context,
+      builder:
+          (_) => FilterDialog(
+            selectedBrand: selectedBrand,
+            selectedCategory: selectedCategory,
+            minPrice: minPrice,
+            maxPrice: maxPrice,
+            sortBy: sortBy,
+            brandOptions: ['All', ...brands.map((b) => b.name)],
+            categoryOptions: ['All', ...cats.map((c) => c.name)],
+            onApply: (b, c, min, max, s) {
+              setState(() {
+                selectedBrand = b;
+                selectedCategory = c;
+                minPrice = min;
+                maxPrice = max;
+                sortBy = s;
+              });
+              _applyFilters();
+            },
+          ),
+    );
+  }
 
-
-  String _getBrandName(String? brandId) {
-    final brand = categories[brandId];
+  String _getBrandName(DocumentReference? brandRef) {
+    if (brandRef == null) return 'Unknown Brand';
+    final brand = categories[brandRef.id];
     if (brand?.type == 1) return brand?.name ?? 'Unknown Brand';
     return 'Unknown Brand';
   }
 
-  String _getCategoryNames(List<String> ids) {
-    return ids.map((id) => categories[id]?.name ?? 'Unknown').join(', ');
+  String _getCategoryNames(List<DocumentReference> refs) {
+    return refs.map((ref) => categories[ref.id]?.name ?? 'Unknown').join(', ');
   }
 
   @override
@@ -231,6 +247,7 @@ class _ProductTableScreenState extends State<ProductTableScreen> {
           ProductSearchBar(
             controller: searchController,
             onFilterTap: _openFilterDialog,
+            onChanged: (_) => _applyFilters(),
           ),
           Expanded(
             child: StreamBuilder<List<ProductModel>>(
@@ -276,7 +293,6 @@ class _ProductTableScreenState extends State<ProductTableScreen> {
                       },
                       onDelete: () async {
                         await ProductService.deleteProduct(p.id);
-                        // No need to refetch manually — stream will update.
                       },
                     );
                   },
