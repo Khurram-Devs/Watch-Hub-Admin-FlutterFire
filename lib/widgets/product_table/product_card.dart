@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:watch_hub_ep/utils/string_utils.dart';
 import '../../models/product_model.dart';
@@ -79,24 +80,35 @@ class ProductCard extends StatelessWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Text(
-                            '\$${product.price.toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.grey,
-                              decoration: TextDecoration.lineThrough,
+                          if (product.discountPercentage == 0)
+                            Text(
+                              '\$${product.price.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF059669),
+                              ),
+                            )
+                          else ...[
+                            Text(
+                              '\$${product.price.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.grey,
+                                decoration: TextDecoration.lineThrough,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            '\$${(product.price * (1 - product.discountPercentage / 100)).toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF059669),
+                            const SizedBox(width: 8),
+                            Text(
+                              '\$${(product.price * (1 - product.discountPercentage / 100)).toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF059669),
+                              ),
                             ),
-                          ),
+                          ],
                         ],
                       ),
                     ],
@@ -123,7 +135,10 @@ class ProductCard extends StatelessWidget {
               children: [
                 Expanded(child: _info('Brand', capitalize(brandName))),
                 Expanded(child: _info('Stock', '${product.inventoryCount}')),
-                Expanded(child: _info('Discount', '${product.discountPercentage}%')),
+                if (product.discountPercentage != 0)
+                  Expanded(
+                    child: _info('Discount', '${product.discountPercentage}%'),
+                  ),
               ],
             ),
             const SizedBox(height: 8),
