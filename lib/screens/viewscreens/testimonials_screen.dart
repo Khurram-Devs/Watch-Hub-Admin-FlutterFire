@@ -126,7 +126,7 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      name,
+                                      capitalizeEachWord(name),
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
@@ -169,11 +169,25 @@ class _TestimonialsScreenState extends State<TestimonialsScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                "Status: ${t.status == 1 ? "Visible" : "Hidden"}",
-                                style: TextStyle(
-                                  color:
-                                      t.status == 1 ? Colors.green : Colors.redAccent,
+                              Text.rich(
+                                TextSpan(
+                                  children: [
+                                    const TextSpan(
+                                      text: "Status: ",
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                    TextSpan(
+                                      text:
+                                          t.status == 1 ? "Visible" : "Hidden",
+                                      style: TextStyle(
+                                        color:
+                                            t.status == 1
+                                                ? Colors.green
+                                                : Colors.redAccent,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                               Text(
