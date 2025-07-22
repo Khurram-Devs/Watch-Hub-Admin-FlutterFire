@@ -18,9 +18,17 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Map<String, Map<String, String>> _userDetails = {};
   String _searchQuery = '';
   String _sortBy = 'created At';
+  String _statusFilter = 'all';
   bool _isLoading = true;
 
   final List<String> _sortOptions = ['created At', 'total', 'status'];
+  final List<String> _statusOptions = [
+    'all',
+    'pending',
+    'shipped',
+    'delivered',
+    'cancelled',
+  ];
 
   @override
   void initState() {
@@ -45,12 +53,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
     _filteredOrders =
         _orders.where((o) {
           final query = _searchQuery.toLowerCase();
-          return o.status.toLowerCase().contains(query) ||
+          final matchSearch =
+              o.status.toLowerCase().contains(query) ||
               o.id.toLowerCase().contains(query) ||
               _userDetails[o.userId]?['fullName']?.toLowerCase().contains(
                     query,
                   ) ==
                   true;
+
+          final matchStatus =
+              _statusFilter == 'all' || o.status == _statusFilter;
+
+          return matchSearch && matchStatus;
         }).toList();
 
     _filteredOrders.sort((a, b) {
@@ -121,11 +135,33 @@ class _OrdersScreenState extends State<OrdersScreen> {
     );
   }
 
+  Widget _buildStatusFilterChips() {
+    return Wrap(
+      spacing: 8,
+      children:
+          _statusOptions.map((status) {
+            final selected = _statusFilter == status;
+            return ChoiceChip(
+              label: Text(capitalize(status)),
+              selected: selected,
+              onSelected: (_) {
+                setState(() {
+                  _statusFilter = status;
+                  _applyFilters();
+                });
+              },
+            );
+          }).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final grouped = <String, List<OrderModel>>{};
+    final grouped = <String, Map<String, List<OrderModel>>>{};
     for (final order in _filteredOrders) {
-      grouped.putIfAbsent(order.userId, () => []).add(order);
+      grouped.putIfAbsent(order.userId, () => {});
+      grouped[order.userId]!.putIfAbsent(order.status, () => []);
+      grouped[order.userId]![order.status]!.add(order);
     }
 
     return Scaffold(
@@ -154,12 +190,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     const SizedBox(height: 12),
                     _buildSortChips(),
                     const SizedBox(height: 12),
+                    _buildStatusFilterChips(),
+                    const SizedBox(height: 12),
                     Expanded(
                       child: ListView(
                         children:
-                            grouped.entries.map((entry) {
-                              final userId = entry.key;
-                              final userOrders = entry.value;
+                            grouped.entries.map((userEntry) {
+                              final userId = userEntry.key;
                               final user = _userDetails[userId];
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,67 +219,99 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                       ),
                                     ),
                                   ),
-                                  ...userOrders.map(
-                                    (o) => Card(
-                                      margin: const EdgeInsets.symmetric(
-                                        vertical: 6,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      elevation: 3,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  "Order#: ${o.id}",
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                IconButton(
-                                                  icon: const Icon(
-                                                    Icons.edit,
-                                                    color: Colors.blue,
-                                                  ),
-                                                  onPressed:
-                                                      () => _updateStatus(o),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              "Total: \$${o.total.toStringAsFixed(2)}",
-                                            ),
-                                            Text(
-                                              "Status: ${capitalize(o.status)}",
-                                              style: TextStyle(
-                                                color: _statusColor(o.status),
-                                                fontWeight: FontWeight.w600,
+                                  ...userEntry.value.entries.map((statusEntry) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: 6,
+                                            bottom: 6,
+                                          ),
+                                          child: Text(
+                                            "Status: ${capitalize(statusEntry.key)}",
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: _statusColor(
+                                                statusEntry.key,
                                               ),
                                             ),
-                                            if (o.promoCode != null &&
-                                                o.promoCode!.isNotEmpty)
-                                              Text(
-                                                "Promo: ${o.promoCode} (${o.promoTitle})",
-                                              ),
-                                            Text("Items: ${o.items.length}"),
-                                            Text(
-                                              "Created: ${timeago.format(o.createdAt)}",
-                                            ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
+                                        ...statusEntry.value.map(
+                                          (o) => Card(
+                                            margin: const EdgeInsets.symmetric(
+                                              vertical: 6,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            elevation: 3,
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(16),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "Order#: ${o.id}",
+                                                        style: const TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                          Icons.edit,
+                                                          color: Colors.blue,
+                                                        ),
+                                                        onPressed:
+                                                            () => _updateStatus(
+                                                              o,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const SizedBox(height: 6),
+                                                  Text(
+                                                    "Total: \$${o.total.toStringAsFixed(2)}",
+                                                  ),
+                                                  Text(
+                                                    "Status: ${capitalize(o.status)}",
+                                                    style: TextStyle(
+                                                      color: _statusColor(
+                                                        o.status,
+                                                      ),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  if (o.promoCode != null &&
+                                                      o.promoCode!.isNotEmpty)
+                                                    Text(
+                                                      "Promo: ${o.promoCode} (${o.promoTitle})",
+                                                    ),
+                                                  Text(
+                                                    "Items: ${o.items.length}",
+                                                  ),
+                                                  Text(
+                                                    "Created: ${timeago.format(o.createdAt)}",
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
                                 ],
                               );
                             }).toList(),
